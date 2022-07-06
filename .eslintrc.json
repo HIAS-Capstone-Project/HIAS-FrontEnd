@@ -5,9 +5,8 @@
   },
   "extends": [
     "plugin:react/recommended",
-    "airbnb-typescript-base",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "airbnb-typescript/base",
+    "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -25,16 +24,10 @@
     "react-hooks/exhaustive-deps": "warn",
     "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
     "import/prefer-default-export": "off",
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      {
-        "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
-      }
-    ],
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/export": "off",
+    "linebreak-style": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-shadow": "off",
     "@typescript-eslint/indent": "off",
@@ -48,8 +41,7 @@
         "namedComponents": "function-expression",
         "unnamedComponents": "function-expression"
       }
-    ],
-    "linebreak-style": ["error", "unix"]
+    ]
   },
   "settings": {
     "import/resolver": {

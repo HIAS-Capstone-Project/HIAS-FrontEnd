@@ -1,0 +1,14 @@
+.antLayoutHeader {
+  transition: width 0.2s;
+  z-index: 9;
+  position: relative;
+  height: 64px;
+  background: #fff !important;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+}
+
+.fixHeader {
+  position: fixed;
+  top: 0;
+  right: 0;
+}

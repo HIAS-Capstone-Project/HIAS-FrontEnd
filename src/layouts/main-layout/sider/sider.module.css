@@ -1,0 +1,6 @@
+.sidebarMenuContainer {
+  height: calc(100% - 64px);
+}
+/* .sidebar-background {
+  background: linear-gradient(45deg, #8b5aed 0%, #78ebfc 100%) !important;
+} */
