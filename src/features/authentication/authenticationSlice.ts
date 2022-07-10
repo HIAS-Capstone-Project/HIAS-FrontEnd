@@ -1,16 +1,18 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from 'app/store';
 import { toggleSiderBar } from 'features/layout/layoutSlice';
 import { ILoginParams } from 'pages/login/types';
 import { AuthService } from 'services';
+import { LocalStorageUtil } from 'utils';
+import { IUser } from './types';
 
 export interface IAuthSlice {
-  user: string;
+  user: IUser | null;
   loading: boolean;
 }
 
 const initialState: IAuthSlice = {
-  user: '',
+  user: null,
   loading: false,
 };
 
@@ -31,7 +33,7 @@ const authSilce = createSlice({
       state.user = action.payload;
     },
     logOut: state => {
-      state.user = '';
+      state.user = null;
     },
   },
   extraReducers: builder => {
@@ -41,7 +43,10 @@ const authSilce = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        LocalStorageUtil.setSessionInfo({
+          token: action.payload?.access_token,
+        });
+        state.user = { ...action.payload, isLogined: true };
       })
       .addCase(login.rejected, state => {
         state.loading = false;

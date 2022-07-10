@@ -1,5 +1,4 @@
-import React from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout } from 'antd';
 import { useAppSelector } from 'app/hooks';
 import { selectLayout } from 'features/layout/layoutSlice';
 import Logo from './logo';
@@ -21,9 +20,7 @@ const LayoutSider = () => {
       trigger={null}
     >
       <Logo />
-      <div className={styles.sidebarMenuContainer}>
-        <Menu />
-      </div>
+      <div className={styles.sidebarMenuContainer}>{/* <Menu /> */}</div>
     </Sider>
   );
 };

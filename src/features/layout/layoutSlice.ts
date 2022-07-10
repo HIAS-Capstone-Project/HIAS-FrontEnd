@@ -6,7 +6,7 @@ export interface ILayoutSlice {
 }
 
 const initialState: ILayoutSlice = {
-  sidebarCollapsed: false,
+  sidebarCollapsed: true,
 };
 
 const layoutSilce = createSlice({

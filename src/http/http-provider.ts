@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { DEFAULT_CONFIG, BASE_URL } from 'config/http-config';
+import { BASE_URL, DEFAULT_CONFIG } from 'config/http-config';
 import { LocalStorageUtil } from 'utils';
 import { errorInterceptor } from './http-error.interceptor';
 import responseInterceptor from './http-response.interceptor';
@@ -36,22 +36,26 @@ class HttpProvider {
     }
   };
 
+  getApiUrl = () => this.apiUrl;
+
+  getApiStatus = () => this.apiStatus;
+
   constructor() {
     this.axiosInstance = axios.create(DEFAULT_CONFIG);
     this.initAuthorization();
     this.baseUrl = BASE_URL;
   }
 
-  // refreshToken = (response: AxiosResponse, callback: any): Promise<any> => {
-  //   const {status, data, config } = response;
-  //   this.apiStatus = status;
-
-  //   if (status === 200) &&
-  // }
-
   setupInterceptors = (callback: any) => {
     this.axiosInstance.interceptors.response.use(
-      res => responseInterceptor(res, callback),
+      res => {
+        if (res) {
+          const { status, config } = res;
+          this.apiUrl = config?.url;
+          this.apiStatus = status;
+        }
+        responseInterceptor(res, callback);
+      },
       err => {
         if (err) {
           const { response, config } = err as AxiosError;
