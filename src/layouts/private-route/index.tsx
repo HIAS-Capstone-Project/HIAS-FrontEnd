@@ -12,7 +12,7 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
   const user = useSelector(selectCurrentUser);
 
   // need flag to check logined
-  const isAuthenticate = session && !!session.token && user?.isLogined;
+  const isAuthenticate = session && !!session.token;
 
   if (!isAuthenticate) return <Navigate to={Routes.LOGIN} replace />;
 

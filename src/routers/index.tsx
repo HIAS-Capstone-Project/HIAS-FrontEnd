@@ -7,6 +7,10 @@ export interface HIASRoute extends RouteProps {
 }
 
 const LoginPage = React.lazy(() => import('../pages/login'));
+const ClientPage = React.lazy(() => import('../pages/client'));
+const ServiceProviderPage = React.lazy(
+  () => import('../pages/service-provider'),
+);
 // const MainLayout = React.lazy(() => import('../layouts/main-layout'));
 
 const routes: HIASRoute[] = [
@@ -18,7 +22,7 @@ const routes: HIASRoute[] = [
   },
   {
     path: '/',
-    element: <LoginPage />,
+    element: <ServiceProviderPage />,
   },
 ];
 

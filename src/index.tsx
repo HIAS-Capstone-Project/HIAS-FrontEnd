@@ -4,13 +4,18 @@ import { Provider } from 'react-redux';
 import { store } from './app/store';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import './styles/index.css';
+import { ConfigProvider } from 'antd';
+import vi_VN from 'antd/es/locale/vi_VN';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 
 root.render(
   <Provider store={store}>
-    <App />
+    <ConfigProvider locale={vi_VN}>
+      <App />
+    </ConfigProvider>
   </Provider>,
 );
 

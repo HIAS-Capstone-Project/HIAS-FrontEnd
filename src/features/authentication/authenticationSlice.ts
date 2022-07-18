@@ -26,7 +26,7 @@ export const login = createAsyncThunk(
 );
 
 const authSilce = createSlice({
-  name: 'auth',
+  name: '@auth',
   initialState,
   reducers: {
     setUser: (state, action) => {
