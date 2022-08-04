@@ -18,3 +18,11 @@ a:hover {
 .ant-table-tbody > tr > td.ant-table-cell-row-hover {
   background: unset;
 }
+
+.app-row {
+  cursor: pointer;
+}
+
+.app-row:hover {
+  background: #ccc !important;
+}

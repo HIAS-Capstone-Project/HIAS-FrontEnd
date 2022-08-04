@@ -11,15 +11,15 @@ import {
 } from 'antd';
 import DateFormat from 'constants/date-format';
 import { QueryParams } from 'pages/service-provider/types';
-import { useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import {
   deleteServiceProvider,
   getServiceProviders,
   saveServiceProvider,
 } from 'services/service.provider.service';
+import { NOT_ACCEPTABLE } from './../../constants';
 import AddServiceProviderForm from './form/add-service-provider-form';
 import EditServiceProviderForm from './form/edit-service-provider';
-import style from './service.provider.module.css';
 import { IServiceProvider } from './types';
 const { Column } = Table;
 
@@ -139,11 +139,12 @@ const ServiceProviderPage = () => {
             formAdd.resetFields();
             getServiceProviderList({ pagination });
           })
-          .catch(err =>
-            formAdd.setFields([
-              { name: 'serviceProviderID', errors: ['Đã tồn tại'] },
-            ]),
-          );
+          .catch(e => {
+            const { httpStatus, fieldName, errorMessage } = e.response.data;
+            if (httpStatus === NOT_ACCEPTABLE) {
+              formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
+            }
+          });
       })
       .finally(() => {
         setServiceProviderPageState({
@@ -157,7 +158,8 @@ const ServiceProviderPage = () => {
     setServiceProviderPageState({
       ...serviceProviderPageState,
       editServiceProviderModalVisible: true,
-      currentRowData: { ...row },
+      currentRowData: row,
+      viewMode: false,
     });
   };
 
@@ -244,7 +246,7 @@ const ServiceProviderPage = () => {
     <div className="app-container">
       <Card title={title}>
         <Table
-          rowClassName={style.row}
+          rowClassName="app-row"
           onRow={record => {
             return {
               onClick: () => {
@@ -285,20 +287,23 @@ const ServiceProviderPage = () => {
           <Column
             title="Thao tác"
             key="action"
-            // width={195}
             align="center"
             render={(text, row: IServiceProvider) => (
               <span>
                 <EditTwoTone
                   style={{ fontSize: '150%' }}
-                  onClick={() => handleEditServiceProvider(row)}
+                  onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    handleEditServiceProvider(row);
+                  }}
                 />
                 <Divider type="vertical" />
                 <DeleteTwoTone
                   style={{ fontSize: '150%' }}
-                  onClick={() =>
-                    handleDeleteServiceProvider(row.serviceProviderNo)
-                  }
+                  onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    handleDeleteServiceProvider(row.serviceProviderNo);
+                  }}
                 />
               </span>
             )}

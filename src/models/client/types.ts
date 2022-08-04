@@ -1,7 +1,9 @@
+import { IClient } from 'pages/client/types';
+
 export interface IClientResponse {
-  clientNo: number;
-  endDate: string;
-  name: string;
-  corporateID: string;
-  startDate: string;
+  totalElements: number;
+  pageSize: number;
+  pageNumber: number;
+  rows: IClient[];
+  totalPage: number;
 }

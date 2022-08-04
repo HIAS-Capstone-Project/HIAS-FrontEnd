@@ -21,7 +21,11 @@ const routes: HIASRoute[] = [
     isFullPage: true,
   },
   {
-    path: '/',
+    path: '/client',
+    element: <ClientPage />,
+  },
+  {
+    path: '/service-provider',
     element: <ServiceProviderPage />,
   },
 ];

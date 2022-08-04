@@ -1,59 +1,97 @@
 import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
-import { Button, Card, Divider, Form, Table } from 'antd';
-import { AppDispatch } from 'app/store';
-import { IClientResponse } from 'models';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addClient, getAll } from 'services/client.service';
+import {
+  Button,
+  Card,
+  Divider,
+  Form,
+  Input,
+  Space,
+  Table,
+  TablePaginationConfig,
+} from 'antd';
+import { MouseEvent, useEffect, useState } from 'react';
+import {
+  addClient,
+  deleteClient,
+  getClients,
+  updateClient,
+} from 'services/client.service';
 import AddClientForm from './forms/add-client-form';
 import EditClientForm from './forms/edit-client-form';
+import { IClient, QueryParams } from './types';
+import { NOT_ACCEPTABLE } from './../../constants';
 const { Column } = Table;
 
 interface ClientPageState {
-  clients: IClientResponse[];
+  clientList: IClient[];
   editClientModalVisible: boolean;
   editClientModalLoading: boolean;
-  currentRowData: IClientResponse;
+  currentRowData: IClient;
   addClientModalVisible: boolean;
   addClientModalLoading: boolean;
+  viewMode: boolean;
 }
 
 const ClientPage = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [form] = Form.useForm();
+  const [formAdd] = Form.useForm();
+  const [formEdit] = Form.useForm();
 
   const initialState = {
-    clients: [] as IClientResponse[],
+    clientList: [] as IClient[],
     editClientModalVisible: false,
     editClientModalLoading: false,
-    currentRowData: {} as IClientResponse,
+    currentRowData: {} as IClient,
     addClientModalVisible: false,
     addClientModalLoading: false,
+    viewMode: false,
   };
 
   const [clientPageState, setClientPageState] =
     useState<ClientPageState>(initialState);
 
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    showSizeChanger: true,
+    showQuickJumper: true,
+    showLessItems: true,
+    current: 1,
+    pageSize: 2,
+    position: ['bottomCenter'],
+    pageSizeOptions: [5, 10, 20],
+    onShowSizeChange(current, size) {
+      setPagination({ ...pagination, pageSize: size, current: 1 });
+    },
+  });
+
+  const [key, setKey] = useState<string>('');
+
   const {
-    clients,
+    clientList,
     addClientModalVisible,
     addClientModalLoading,
     currentRowData,
     editClientModalVisible,
     editClientModalLoading,
+    viewMode,
   } = clientPageState;
 
-  const getClients = async () => {
-    getAll().then(res => {
+  const getClientList = async (params: QueryParams = {}) => {
+    getClients(params).then(res => {
       if (res) {
-        setClientPageState({ ...clientPageState, clients: res });
+        setClientPageState({
+          clientList: res.rows,
+          currentRowData: {} as IClient,
+          addClientModalVisible: false,
+          addClientModalLoading: false,
+          editClientModalLoading: false,
+          editClientModalVisible: false,
+          viewMode: false,
+        });
       }
     });
   };
   useEffect(() => {
-    // dispatch(getAllClients());
-    getClients();
-  }, [dispatch]);
+    getClientList({ pagination });
+  }, []);
 
   const handleAddClient = () => {
     setClientPageState({ ...clientPageState, addClientModalVisible: true });
@@ -61,62 +99,144 @@ const ClientPage = () => {
 
   const handleAddClientOK = () => {
     setClientPageState({ ...clientPageState, addClientModalLoading: true });
-    form.validateFields().then(value => {
-      addClient(value)
+    formAdd.validateFields().then(() => {
+      const fieldValue = formAdd.getFieldsValue();
+
+      addClient(fieldValue)
         .then(res => {
-          form.resetFields();
-          setClientPageState({
-            ...clientPageState,
-            addClientModalVisible: false,
-            addClientModalLoading: false,
-          });
-          // load client again
-          getClients();
+          formAdd.resetFields();
+          getClientList({ pagination });
         })
         .catch(e => {
-          console.log(e);
+          const { httpStatus, fieldName, errorMessage } = e.response.data;
+          if (httpStatus === NOT_ACCEPTABLE) {
+            formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
+          }
+        })
+        .then(() => {
+          setClientPageState({
+            ...clientPageState,
+            addClientModalLoading: false,
+          });
         });
     });
   };
 
-  const handleEditClient = (row: IClientResponse) => {
+  const handleEditClient = (row: IClient) => {
     setClientPageState({
       ...clientPageState,
       editClientModalVisible: true,
-      currentRowData: row,
+      currentRowData: { ...row },
+      viewMode: false,
     });
   };
 
+  const handleEditClientOK = () => {
+    if (viewMode) {
+      setClientPageState({
+        ...clientPageState,
+        viewMode: false,
+      });
+      return;
+    }
+    setClientPageState({
+      ...clientPageState,
+      editClientModalLoading: true,
+    });
+    formEdit.validateFields().then(() => {
+      const fieldValue = formEdit.getFieldsValue();
+
+      const value = {
+        ...fieldValue,
+        clientNo: currentRowData.clientNo,
+      };
+
+      formEdit.resetFields();
+      updateClient(value).then(res => {
+        getClientList({ pagination });
+      });
+    });
+  };
+
+  const handleTableChange = (newPagination: TablePaginationConfig) => {
+    getClientList({ pagination: newPagination, key });
+  };
+
+  const onSearch = (value: string) => {
+    setKey(value);
+    getClientList({ pagination, key: value });
+  };
+
+  const handleDeleteClient = async (clientNo: number) => {
+    await deleteClient(clientNo);
+    getClientList({ pagination });
+  };
+
   const title = (
-    <span>
-      <Button size="large" type="primary" onClick={handleAddClient}>
-        Add client
-      </Button>
-    </span>
+    <Space
+      direction="horizontal"
+      style={{ justifyContent: 'space-between', width: '100%' }}
+    >
+      <span>
+        <Button size="large" type="primary" onClick={handleAddClient}>
+          Thêm Doanh Nghiệp
+        </Button>
+      </span>
+      <Input.Search
+        placeholder="Nhập vào giá trị muốn tìm kiếm"
+        allowClear
+        enterButton="Tìm kiếm"
+        size="large"
+        onSearch={onSearch}
+      />
+    </Space>
   );
 
   const handleCancel = () => {
+    formAdd.resetFields();
+    formEdit.resetFields();
     setClientPageState({
       ...clientPageState,
       addClientModalVisible: false,
       editClientModalVisible: false,
+      currentRowData: {} as IClient,
+      viewMode: false,
     });
   };
 
   return (
     <div className="app-container">
       <Card title={title}>
-        <Table bordered rowKey="id" dataSource={clients} pagination={false}>
+        <Table
+          rowClassName="app-row"
+          onRow={record => {
+            return {
+              onClick: () => {
+                setClientPageState({
+                  ...clientPageState,
+                  editClientModalVisible: true,
+                  viewMode: true,
+                  currentRowData: record,
+                });
+              },
+            };
+          }}
+          bordered
+          rowKey="clientNo"
+          dataSource={clientList}
+          pagination={pagination}
+          onChange={handleTableChange}
+        >
           <Column
-            title="Mã công ty"
+            title="Mã doanh nghiệp"
             dataIndex="corporateID"
             key="corporateID"
             align="center"
           />
           <Column
-            title="Tên công ty"
-            dataIndex="name"
-            key="name"
+            title="Tên doanh nghiệp"
+            dataIndex="clientName"
+            key="clientName"
             align="center"
           />
           <Column
@@ -125,6 +245,7 @@ const ClientPage = () => {
             key="address"
             align="center"
           />
+          <Column title="Email" dataIndex="email" key="email" align="center" />
           <Column
             title="Số điện thoại"
             dataIndex="phoneNumber"
@@ -134,45 +255,40 @@ const ClientPage = () => {
           <Column
             title="Thao tác"
             key="action"
-            // width={195}
             align="center"
-            render={(text, row: IClientResponse) => (
+            render={(text, row: IClient) => (
               <span>
                 <EditTwoTone
                   style={{ fontSize: '150%' }}
-                  onClick={() => handleEditClient(row)}
+                  onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    handleEditClient(row);
+                  }}
                 />
-                {/* <Button
-                  type="primary"
-                  shape="circle"
-                  icon="edit"
-                  title="编辑"
-                  // onClick={this.handleEditUser.bind(null, row)}
-                /> */}
                 <Divider type="vertical" />
-                <DeleteTwoTone style={{ fontSize: '150%' }} />
-                {/* <Button
-                  type="primary"
-                  shape="circle"
-                  icon="delete"
-                  title="删除"
-                  // onClick={this.handleDeleteUser.bind(null, row)}
-                /> */}
+                <DeleteTwoTone
+                  style={{ fontSize: '150%' }}
+                  onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    handleDeleteClient(row.clientNo);
+                  }}
+                />
               </span>
             )}
           />
         </Table>
       </Card>
       <EditClientForm
+        viewMode={viewMode}
         currentRowData={currentRowData}
-        form={form}
+        form={formEdit}
         visible={editClientModalVisible}
         confirmLoading={editClientModalLoading}
         onCancel={handleCancel}
-        onOk={handleAddClientOK}
+        onOk={handleEditClientOK}
       />
       <AddClientForm
-        form={form}
+        form={formAdd}
         visible={addClientModalVisible}
         confirmLoading={addClientModalLoading}
         onCancel={handleCancel}

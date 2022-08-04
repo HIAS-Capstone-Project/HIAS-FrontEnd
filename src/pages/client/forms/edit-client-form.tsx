@@ -1,49 +1,112 @@
-import React from 'react';
-import { Form, Input, Select, Modal, FormInstance } from 'antd';
-import { IClientResponse } from 'models';
+import { Form, Input, Modal } from 'antd';
+import { useEffect } from 'react';
+import { UpdateFormProps } from '../types';
 
-interface UpdateClientFormPops {
-  visible: boolean;
-  onCancel: () => void;
-  onOk: () => void;
-  confirmLoading: boolean;
-  form: FormInstance;
-  currentRowData: IClientResponse;
-}
+const EditClientForm = (props: UpdateFormProps) => {
+  const {
+    form,
+    visible,
+    onCancel,
+    onOk,
+    confirmLoading,
+    currentRowData,
+    viewMode,
+  } = props;
 
-const EditClientForm = (props: UpdateClientFormPops) => {
-  const { form, visible, onCancel, onOk, confirmLoading, currentRowData } =
-    props;
-  const { corporateID, name } = currentRowData;
+  useEffect(() => {
+    form.setFieldsValue(currentRowData);
+  }, [form, currentRowData]);
+  const { corporateID } = currentRowData;
+
   return (
     <Modal
-      title="Chỉnh sửa công ty"
+      title="Chỉnh sửa doanh nghiệp"
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}
       confirmLoading={confirmLoading}
+      cancelText="Hủy"
+      okText="Sửa"
+      maskClosable={false}
     >
-      <Form initialValues={{ corporateID, name }} form={form} size="large">
+      <Form
+        key={corporateID}
+        form={form}
+        layout="vertical"
+        disabled={viewMode}
+        initialValues={currentRowData}
+      >
         <Form.Item
           name="corporateID"
-          label="Mã công ty:"
-          rules={[{ required: true, message: 'Hãy nhập vào mã công ty!' }]}
+          label="Mã doanh nghiệp:"
+          rules={[{ required: true, message: 'Hãy nhập vào mã doanh nghiệp!' }]}
         >
           <Input
+            disabled
             autoComplete="false"
             size="large"
-            placeholder="Nhập vào mã công ty"
+            placeholder="Nhập vào mã doanh nghiệp"
           />
         </Form.Item>
         <Form.Item
-          name="name"
-          label="Tên công ty:"
-          rules={[{ required: true, message: 'Hãy nhập vào tên công ty!' }]}
+          name="clientName"
+          label="Tên doanh nghiệp:"
+          rules={[
+            { required: true, message: 'Hãy nhập vào tên doanh nghiệp!' },
+          ]}
         >
           <Input
             autoComplete="false"
             size="large"
             placeholder="Nhập vào tên công ty"
+          />
+        </Form.Item>
+        <Form.Item
+          name="email"
+          label="Email:"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy nhập vào email của doanh nghiệp!',
+            },
+          ]}
+        >
+          <Input
+            autoComplete="false"
+            size="large"
+            placeholder="Nhập vào email của doanh nghiệp"
+          />
+        </Form.Item>
+        <Form.Item
+          name="address"
+          label="Địa chỉ:"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy nhập vào địa chỉ của doanh nghiệp!',
+            },
+          ]}
+        >
+          <Input.TextArea
+            autoComplete="false"
+            size="large"
+            placeholder="Nhập vào địa chỉ của doanh nghiệp"
+          />
+        </Form.Item>
+        <Form.Item
+          name="phoneNumber"
+          label="Số điện thoại"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy nhập vào số điện thoại của doanh nghiệp!',
+            },
+          ]}
+        >
+          <Input
+            autoComplete="false"
+            size="large"
+            placeholder="Nhập vào số điện thoại của doanh nghiệp"
           />
         </Form.Item>
       </Form>

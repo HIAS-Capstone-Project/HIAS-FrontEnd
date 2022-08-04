@@ -14,33 +14,90 @@ const AddClientForm = (props: AddClientFormPops) => {
 
   return (
     <Modal
-      title="Thêm Công Ty"
+      title="Thêm doanh nghiệp"
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}
       confirmLoading={confirmLoading}
+      cancelText="Hủy"
+      okText="Thêm"
+      maskClosable={false}
     >
-      <Form form={form} size="large">
+      <Form form={form} layout="vertical">
         <Form.Item
           name="corporateID"
-          label="Mã công ty:"
-          rules={[{ required: true, message: 'Hãy nhập vào mã công ty!' }]}
+          label="Mã doanh nghiệp:"
+          rules={[{ required: true, message: 'Hãy nhập vào mã doanh nghiệp!' }]}
         >
           <Input
             autoComplete="false"
             size="large"
-            placeholder="Nhập vào mã công ty"
+            placeholder="Nhập vào mã doanh nghiệp"
           />
         </Form.Item>
         <Form.Item
-          name="name"
-          label="Tên công ty:"
-          rules={[{ required: true, message: 'Hãy nhập vào tên công ty!' }]}
+          name="clientName"
+          label="Tên doanh nghiệp:"
+          rules={[
+            { required: true, message: 'Hãy nhập vào tên doanh nghiệp!' },
+          ]}
         >
           <Input
             autoComplete="false"
             size="large"
             placeholder="Nhập vào tên công ty"
+          />
+        </Form.Item>
+        <Form.Item
+          name="email"
+          label="Email:"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy nhập vào email của doanh nghiệp!',
+            },
+            {
+              type: 'email',
+              message: 'Email của doanh nghiệp không hợp lệ!',
+            },
+          ]}
+        >
+          <Input
+            autoComplete="false"
+            size="large"
+            placeholder="Nhập vào email của doanh nghiệp"
+          />
+        </Form.Item>
+        <Form.Item
+          name="address"
+          label="Địa chỉ:"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy nhập vào địa chỉ của doanh nghiệp!',
+            },
+          ]}
+        >
+          <Input.TextArea
+            autoComplete="false"
+            size="large"
+            placeholder="Nhập vào địa chỉ của doanh nghiệp"
+          />
+        </Form.Item>
+        <Form.Item
+          name="phoneNumber"
+          label="Số điện thoại"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy nhập vào số điện thoại của doanh nghiệp!',
+            },
+          ]}
+        >
+          <Input
+            autoComplete="false"
+            size="large"
+            placeholder="Nhập vào số điện thoại của doanh nghiệp"
           />
         </Form.Item>
       </Form>
