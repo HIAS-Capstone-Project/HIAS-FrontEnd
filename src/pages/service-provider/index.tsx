@@ -56,7 +56,7 @@ const ServiceProviderPage = () => {
     // hideOnSinglePage: true,
     showLessItems: true,
     current: 1,
-    pageSize: 2,
+    pageSize: 5,
     position: ['bottomCenter'],
     pageSizeOptions: [5, 10, 20],
     onShowSizeChange(current, size) {
@@ -146,6 +146,8 @@ const ServiceProviderPage = () => {
             }
           });
       })
+      /** @TO_DO catch error after validate FE */
+      .catch(() => {})
       .finally(() => {
         setServiceProviderPageState({
           ...serviceProviderPageState,

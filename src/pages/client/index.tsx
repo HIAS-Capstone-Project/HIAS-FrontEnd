@@ -54,7 +54,7 @@ const ClientPage = () => {
     showQuickJumper: true,
     showLessItems: true,
     current: 1,
-    pageSize: 2,
+    pageSize: 5,
     position: ['bottomCenter'],
     pageSizeOptions: [5, 10, 20],
     onShowSizeChange(current, size) {
@@ -86,6 +86,17 @@ const ClientPage = () => {
           editClientModalVisible: false,
           viewMode: false,
         });
+        setPagination({
+          ...pagination,
+          total: res.totalElements,
+          current: res.pageNumber + 1,
+          pageSize: params.pagination?.pageSize,
+          showTotal: (total, range) => {
+            if (params.pagination?.pageSize === 1 || res.rows.length === 1)
+              return `${range[0]} trong ${total}`;
+            return `${range[0]}-${range[1]} trong ${total}`;
+          },
+        });
       }
     });
   };
@@ -99,27 +110,31 @@ const ClientPage = () => {
 
   const handleAddClientOK = () => {
     setClientPageState({ ...clientPageState, addClientModalLoading: true });
-    formAdd.validateFields().then(() => {
-      const fieldValue = formAdd.getFieldsValue();
+    formAdd
+      .validateFields()
+      .then(() => {
+        const fieldValue = formAdd.getFieldsValue();
 
-      addClient(fieldValue)
-        .then(res => {
-          formAdd.resetFields();
-          getClientList({ pagination });
-        })
-        .catch(e => {
-          const { httpStatus, fieldName, errorMessage } = e.response.data;
-          if (httpStatus === NOT_ACCEPTABLE) {
-            formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
-          }
-        })
-        .then(() => {
-          setClientPageState({
-            ...clientPageState,
-            addClientModalLoading: false,
+        addClient(fieldValue)
+          .then(res => {
+            formAdd.resetFields();
+            getClientList({ pagination });
+          })
+          .catch(e => {
+            const { httpStatus, fieldName, errorMessage } = e.response.data;
+            if (httpStatus === NOT_ACCEPTABLE) {
+              formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
+            }
           });
+      })
+      /** @TO_DO catch error after validate FE */
+      .catch(() => {})
+      .finally(() => {
+        setClientPageState({
+          ...clientPageState,
+          addClientModalLoading: false,
         });
-    });
+      });
   };
 
   const handleEditClient = (row: IClient) => {
