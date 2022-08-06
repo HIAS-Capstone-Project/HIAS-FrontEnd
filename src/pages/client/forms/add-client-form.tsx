@@ -1,15 +1,7 @@
-import React from 'react';
-import { Form, Input, Select, Modal, FormInstance } from 'antd';
+import { Form, Input, Modal } from 'antd';
+import { FormProps } from '../types';
 
-interface AddClientFormPops {
-  visible: boolean;
-  onCancel: () => void;
-  onOk: () => void;
-  confirmLoading: boolean;
-  form: FormInstance;
-}
-
-const AddClientForm = (props: AddClientFormPops) => {
+const AddClientForm = (props: FormProps) => {
   const { form, visible, onCancel, onOk, confirmLoading } = props;
 
   return (
@@ -45,7 +37,7 @@ const AddClientForm = (props: AddClientFormPops) => {
           <Input
             autoComplete="false"
             size="large"
-            placeholder="Nhập vào tên công ty"
+            placeholder="Nhập vào tên doanh nghiệp"
           />
         </Form.Item>
         <Form.Item

@@ -12,6 +12,7 @@ const ServiceProviderPage = React.lazy(
   () => import('../pages/service-provider'),
 );
 const PolicyPage = React.lazy(() => import('../pages/policy'));
+const BenefitPage = React.lazy(() => import('../pages/benefit'));
 // const MainLayout = React.lazy(() => import('../layouts/main-layout'));
 
 const routes: HIASRoute[] = [
@@ -32,6 +33,10 @@ const routes: HIASRoute[] = [
   {
     path: '/policy',
     element: <PolicyPage />,
+  },
+  {
+    path: '/benefit',
+    element: <BenefitPage />,
   },
 ];
 

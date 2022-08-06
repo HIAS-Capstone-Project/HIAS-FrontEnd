@@ -58,7 +58,7 @@ const EditClientForm = (props: UpdateFormProps) => {
           <Input
             autoComplete="false"
             size="large"
-            placeholder="Nhập vào tên công ty"
+            placeholder="Nhập vào tên doanh nghiệp"
           />
         </Form.Item>
         <Form.Item

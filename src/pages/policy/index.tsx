@@ -124,36 +124,27 @@ const PolicyPage = () => {
 
   const handleAddPolicyOK = async () => {
     setPolicyPageState({ ...policyPageState, addPolicyModalLoading: true });
-    formAdd
-      .validateFields()
-      .then(() => {
-        const fieldValue = formAdd.getFieldsValue();
+    formAdd.validateFields().then(() => {
+      const fieldValue = formAdd.getFieldsValue();
 
-        addPolicy(fieldValue)
-          .then(res => {
-            formAdd.resetFields();
-            getPolicyList({ pagination });
-          })
-          .catch(e => {
-            const { httpStatus, fieldName, errorMessage } = e.response.data;
-            if (httpStatus === NOT_ACCEPTABLE) {
-              formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
-            }
-            setPolicyPageState({
-              ...policyPageState,
-              addPolicyModalLoading: false,
-            });
+      addPolicy(fieldValue)
+        .then(res => {
+          formAdd.resetFields();
+          getPolicyList({ pagination });
+        })
+        .catch(e => {
+          const { httpStatus, fieldName, errorMessage } = e.response.data;
+          if (httpStatus === NOT_ACCEPTABLE) {
+            formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
+          }
+          setPolicyPageState({
+            ...policyPageState,
+            addPolicyModalLoading: false,
           });
-      })
-      /** @TO_DO catch error after validate FE */
-      .catch(() => {
-        setPolicyPageState({
-          ...policyPageState,
-          addPolicyModalLoading: false,
         });
-      });
-    // .finally(() => {
-    // });
+    });
+    /** @TO_DO catch error after validate FE */
+    // .catch(() => {});
   };
 
   const handleEditPolicy = (row: IPolicy) => {
@@ -177,41 +168,32 @@ const PolicyPage = () => {
       ...policyPageState,
       editPolicyModalLoading: true,
     });
-    formEdit
-      .validateFields()
-      .then(() => {
-        const fieldValue = formEdit.getFieldsValue();
+    formEdit.validateFields().then(() => {
+      const fieldValue = formEdit.getFieldsValue();
 
-        const value = {
-          ...fieldValue,
-          policyNo: currentRowData.policyNo,
-        };
+      const value = {
+        ...fieldValue,
+        policyNo: currentRowData.policyNo,
+      };
 
-        formEdit.resetFields();
-        updatePolicy(value)
-          .then(res => {
-            getPolicyList({ pagination });
-          })
-          .catch(e => {
-            const { httpStatus, fieldName, errorMessage } = e.response.data;
-            if (httpStatus === NOT_ACCEPTABLE) {
-              formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
-            }
-            setPolicyPageState({
-              ...policyPageState,
-              editPolicyModalLoading: false,
-            });
+      formEdit.resetFields();
+      updatePolicy(value)
+        .then(res => {
+          getPolicyList({ pagination });
+        })
+        .catch(e => {
+          const { httpStatus, fieldName, errorMessage } = e.response.data;
+          if (httpStatus === NOT_ACCEPTABLE) {
+            formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
+          }
+          setPolicyPageState({
+            ...policyPageState,
+            editPolicyModalLoading: false,
           });
-      })
-      /** @TO_DO catch error after validate FE */
-      .catch(() => {
-        setPolicyPageState({
-          ...policyPageState,
-          editPolicyModalLoading: false,
         });
-      });
-    // .finally(() => {
-    // });
+    });
+    /** @TO_DO catch error after validate FE */
+    // .catch(() => {});
   };
 
   const handleTableChange = (newPagination: TablePaginationConfig) => {
