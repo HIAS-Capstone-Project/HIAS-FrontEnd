@@ -69,6 +69,10 @@ const EditClientForm = (props: UpdateFormProps) => {
               required: true,
               message: 'Hãy nhập vào email của doanh nghiệp!',
             },
+            {
+              type: 'email',
+              message: 'Email của doanh nghiệp không hợp lệ!',
+            },
           ]}
         >
           <Input

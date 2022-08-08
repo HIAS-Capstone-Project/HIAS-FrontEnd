@@ -57,6 +57,10 @@ const AddServiceProviderForm = (props: FormProps) => {
               required: true,
               message: 'Hãy nhập vào email của cơ sở khám chữa bệnh!',
             },
+            {
+              type: 'email',
+              message: 'Email của cơ sở khám chữa bệnh không hợp lệ!',
+            },
           ]}
         >
           <Input

@@ -114,50 +114,47 @@ const ServiceProviderPage = () => {
   };
 
   const handleAddServiceProviderOK = () => {
-    setServiceProviderPageState({
-      ...serviceProviderPageState,
-      addServiceProviderModalLoading: true,
-    });
-    formAdd
-      .validateFields()
-      .then(() => {
-        const fieldValue = formAdd.getFieldsValue();
-
-        const value = {
-          ...fieldValue,
-          startDate: fieldValue.timeRange[0]
-            .format(DateFormat.DDMMYYYY)
-            .concat(' 00:00:00'),
-          endDate: fieldValue.timeRange[1]
-            .format(DateFormat.DDMMYYYY)
-            .concat(' 00:00:00'),
-        };
-        delete value.timeRange;
-
-        saveServiceProvider(value)
-          .then(res => {
-            formAdd.resetFields();
-            getServiceProviderList({ pagination });
-          })
-          .catch(e => {
-            const { httpStatus, fieldName, errorMessage } = e.response.data;
-            if (httpStatus === NOT_ACCEPTABLE) {
-              formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
-            }
-            setServiceProviderPageState({
-              ...serviceProviderPageState,
-              addServiceProviderModalLoading: false,
-            });
-          });
-      })
-      /** @TO_DO catch error after validate FE */
-      // .catch(() => {})
-      .finally(() => {
-        setServiceProviderPageState({
-          ...serviceProviderPageState,
-          addServiceProviderModalLoading: false,
-        });
+    formAdd.validateFields().then(() => {
+      setServiceProviderPageState({
+        ...serviceProviderPageState,
+        addServiceProviderModalLoading: true,
       });
+      const fieldValue = formAdd.getFieldsValue();
+      fieldValue.serviceProviderID = fieldValue.serviceProviderID.trim();
+      const value = {
+        ...fieldValue,
+        startDate: fieldValue.timeRange[0]
+          .format(DateFormat.DDMMYYYY)
+          .concat(' 00:00:00'),
+        endDate: fieldValue.timeRange[1]
+          .format(DateFormat.DDMMYYYY)
+          .concat(' 00:00:00'),
+      };
+      delete value.timeRange;
+
+      saveServiceProvider(value)
+        .then(res => {
+          formAdd.resetFields();
+          getServiceProviderList({ pagination });
+        })
+        .catch(e => {
+          const { httpStatus, fieldName, errorMessage } = e.response.data;
+          if (httpStatus === NOT_ACCEPTABLE) {
+            formAdd.setFields([
+              {
+                name: fieldName,
+                errors: [errorMessage],
+                value: formAdd.getFieldValue(fieldName).trim(),
+              },
+            ]);
+          }
+          setServiceProviderPageState({
+            ...serviceProviderPageState,
+            addServiceProviderModalLoading: false,
+          });
+        });
+    });
+    /** @TO_DO catch error after validate FE */
   };
 
   const handleEditServiceProvider = (row: IServiceProvider) => {
@@ -177,37 +174,29 @@ const ServiceProviderPage = () => {
       });
       return;
     }
-    setServiceProviderPageState({
-      ...serviceProviderPageState,
-      editServiceProviderModalLoading: true,
-    });
-    formEdit
-      .validateFields()
-      .then(() => {
-        const fieldValue = formEdit.getFieldsValue();
-
-        const value = {
-          ...fieldValue,
-          serviceProviderNo: currentRowData.serviceProviderNo,
-          startDate: fieldValue.timeRange[0]
-            .format(DateFormat.DDMMYYYY)
-            .concat(' 00:00:00'),
-          endDate: fieldValue.timeRange[1]
-            .format(DateFormat.DDMMYYYY)
-            .concat(' 00:00:00'),
-        };
-        delete value.timeRange;
-        formEdit.resetFields();
-        saveServiceProvider(value).then(res => {
-          getServiceProviderList({ pagination });
-        });
-      })
-      .finally(() => {
-        setServiceProviderPageState({
-          ...serviceProviderPageState,
-          editServiceProviderModalLoading: false,
-        });
+    formEdit.validateFields().then(() => {
+      const fieldValue = formEdit.getFieldsValue();
+      setServiceProviderPageState({
+        ...serviceProviderPageState,
+        editServiceProviderModalLoading: true,
+        currentRowData: fieldValue,
       });
+      const value = {
+        ...fieldValue,
+        serviceProviderNo: currentRowData.serviceProviderNo,
+        startDate: fieldValue.timeRange[0]
+          .format(DateFormat.DDMMYYYY)
+          .concat(' 00:00:00'),
+        endDate: fieldValue.timeRange[1]
+          .format(DateFormat.DDMMYYYY)
+          .concat(' 00:00:00'),
+      };
+      delete value.timeRange;
+      formEdit.resetFields();
+      saveServiceProvider(value).then(res => {
+        getServiceProviderList({ pagination });
+      });
+    });
   };
 
   const handleTableChange = (newPagination: TablePaginationConfig) => {

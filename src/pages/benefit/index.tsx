@@ -109,35 +109,35 @@ const BenefitPage = () => {
   };
 
   const handleAddBenefitOK = () => {
-    setBenefitPageState({ ...benefitPageState, addBenefitModalLoading: true });
-    formAdd
-      .validateFields()
-      .then(() => {
-        const fieldValue = formAdd.getFieldsValue();
-
-        addBenefit(fieldValue)
-          .then(res => {
-            formAdd.resetFields();
-            getBenefitList({ pagination });
-          })
-          .catch(e => {
-            const { httpStatus, fieldName, errorMessage } = e.response.data;
-            if (httpStatus === NOT_ACCEPTABLE) {
-              formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
-            }
-            setBenefitPageState({
-              ...benefitPageState,
-              addBenefitModalLoading: false,
-            });
-          });
-      })
-      /** @TO_DO catch error after validate FE */
-      .finally(() => {
-        setBenefitPageState({
-          ...benefitPageState,
-          addBenefitModalLoading: false,
-        });
+    formAdd.validateFields().then(() => {
+      const fieldValue = formAdd.getFieldsValue();
+      fieldValue.benefitCode = fieldValue.benefitCode.trim();
+      setBenefitPageState({
+        ...benefitPageState,
+        addBenefitModalLoading: true,
       });
+      addBenefit(fieldValue)
+        .then(res => {
+          formAdd.resetFields();
+          getBenefitList({ pagination });
+        })
+        .catch(e => {
+          const { httpStatus, fieldName, errorMessage } = e.response.data;
+          if (httpStatus === NOT_ACCEPTABLE) {
+            formAdd.setFields([
+              {
+                name: fieldName,
+                errors: [errorMessage],
+                value: formAdd.getFieldValue(fieldName).trim(),
+              },
+            ]);
+          }
+          setBenefitPageState({
+            ...benefitPageState,
+            addBenefitModalLoading: false,
+          });
+        });
+    });
   };
 
   const handleEditBenefit = (row: IBenefit) => {
@@ -157,31 +157,23 @@ const BenefitPage = () => {
       });
       return;
     }
-    setBenefitPageState({
-      ...benefitPageState,
-      editBenefitModalLoading: true,
-    });
-    formEdit
-      .validateFields()
-      .then(() => {
-        const fieldValue = formEdit.getFieldsValue();
-
-        const value = {
-          ...fieldValue,
-          benefitNo: currentRowData.benefitNo,
-        };
-
-        formEdit.resetFields();
-        updateBenefit(value).then(res => {
-          getBenefitList({ pagination });
-        });
-      })
-      .finally(() => {
-        setBenefitPageState({
-          ...benefitPageState,
-          editBenefitModalLoading: false,
-        });
+    formEdit.validateFields().then(() => {
+      const fieldValue = formEdit.getFieldsValue();
+      setBenefitPageState({
+        ...benefitPageState,
+        editBenefitModalLoading: true,
+        currentRowData: fieldValue,
       });
+      const value = {
+        ...fieldValue,
+        benefitNo: currentRowData.benefitNo,
+      };
+
+      formEdit.resetFields();
+      updateBenefit(value).then(res => {
+        getBenefitList({ pagination });
+      });
+    });
   };
 
   const handleTableChange = (newPagination: TablePaginationConfig) => {

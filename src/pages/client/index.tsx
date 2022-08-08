@@ -109,35 +109,33 @@ const ClientPage = () => {
   };
 
   const handleAddClientOK = () => {
-    setClientPageState({ ...clientPageState, addClientModalLoading: true });
-    formAdd
-      .validateFields()
-      .then(() => {
-        const fieldValue = formAdd.getFieldsValue();
-
-        addClient(fieldValue)
-          .then(res => {
-            formAdd.resetFields();
-            getClientList({ pagination });
-          })
-          .catch(e => {
-            const { httpStatus, fieldName, errorMessage } = e.response.data;
-            if (httpStatus === NOT_ACCEPTABLE) {
-              formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
-            }
-            setClientPageState({
-              ...clientPageState,
-              addClientModalLoading: false,
-            });
+    formAdd.validateFields().then(() => {
+      const fieldValue = formAdd.getFieldsValue();
+      fieldValue.corporateID = fieldValue.corporateID.trim();
+      setClientPageState({ ...clientPageState, addClientModalLoading: true });
+      addClient(fieldValue)
+        .then(res => {
+          formAdd.resetFields();
+          getClientList({ pagination });
+        })
+        .catch(e => {
+          const { httpStatus, fieldName, errorMessage } = e.response.data;
+          if (httpStatus === NOT_ACCEPTABLE) {
+            formAdd.setFields([
+              {
+                name: fieldName,
+                errors: [errorMessage],
+                value: formAdd.getFieldValue(fieldName).trim(),
+              },
+            ]);
+          }
+          setClientPageState({
+            ...clientPageState,
+            addClientModalLoading: false,
           });
-      })
-      /** @TO_DO catch error after validate FE */
-      .finally(() => {
-        setClientPageState({
-          ...clientPageState,
-          addClientModalLoading: false,
         });
-      });
+    });
+    /** @TO_DO catch error after validate FE */
   };
 
   const handleEditClient = (row: IClient) => {
@@ -157,31 +155,23 @@ const ClientPage = () => {
       });
       return;
     }
-    setClientPageState({
-      ...clientPageState,
-      editClientModalLoading: true,
-    });
-    formEdit
-      .validateFields()
-      .then(() => {
-        const fieldValue = formEdit.getFieldsValue();
-
-        const value = {
-          ...fieldValue,
-          clientNo: currentRowData.clientNo,
-        };
-
-        formEdit.resetFields();
-        updateClient(value).then(res => {
-          getClientList({ pagination });
-        });
-      })
-      .finally(() => {
-        setClientPageState({
-          ...clientPageState,
-          editClientModalLoading: false,
-        });
+    formEdit.validateFields().then(() => {
+      const fieldValue = formEdit.getFieldsValue();
+      setClientPageState({
+        ...clientPageState,
+        editClientModalLoading: true,
+        currentRowData: fieldValue,
       });
+      const value = {
+        ...fieldValue,
+        clientNo: currentRowData.clientNo,
+      };
+
+      updateClient(value).then(res => {
+        getClientList({ pagination });
+      });
+      formEdit.resetFields();
+    });
   };
 
   const handleTableChange = (newPagination: TablePaginationConfig) => {
