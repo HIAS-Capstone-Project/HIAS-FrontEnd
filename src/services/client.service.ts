@@ -3,7 +3,7 @@ import { IClientResponse } from 'models/client/types';
 import { IClient, QueryParams } from 'pages/client/types';
 import queryString from 'query-string';
 
-export const getAll = async () => {
+export const getAllClient = async () => {
   const response = await httpProvider.get<IClient[]>('client/get-all');
   return response.data;
 };

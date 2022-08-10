@@ -3,8 +3,8 @@ import { IBenefitResponse } from 'models/benefit/types';
 import { IBenefit, QueryParams } from 'pages/benefit/types';
 import queryString from 'query-string';
 
-export const getAll = async () => {
-  const response = await httpProvider.get<IBenefit[]>('benefit/get-all');
+export const getAllBenefit = async () => {
+  const response = await httpProvider.get<IBenefit[]>('benefit/find-all');
   return response.data;
 };
 
