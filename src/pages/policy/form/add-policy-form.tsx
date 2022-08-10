@@ -1,8 +1,15 @@
-import { Form, Input, Modal, Select } from 'antd';
+import { Checkbox, Form, Input, Modal, Select } from 'antd';
 import { FormProps } from '../types';
 
 const AddPolicyForm = (props: FormProps) => {
-  const { form, visible, onCancel, onOk, confirmLoading, clients } = props;
+  const { form, visible, onCancel, onOk, confirmLoading, clients, benefits } =
+    props;
+  const options = benefits.map(benefit => {
+    return {
+      label: benefit.benefitName,
+      value: benefit.benefitNo,
+    };
+  });
   return (
     <Modal
       title="Thêm chính sách"
@@ -67,6 +74,16 @@ const AddPolicyForm = (props: FormProps) => {
               );
             })}
           </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="benefitNos"
+          label="Chọn các quyền lợi:"
+          rules={[
+            { required: true, message: 'Hãy chọn ít nhất một quyền lợi!' },
+          ]}
+        >
+          <Checkbox.Group options={options} />
         </Form.Item>
 
         <Form.Item name="remark" label="Ghi chú:">

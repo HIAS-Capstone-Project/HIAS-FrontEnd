@@ -1,18 +1,17 @@
 import { FormInstance, TablePaginationConfig } from 'antd';
 import { IBenefit } from 'pages/benefit/types';
-import { IClient } from 'pages/client/types';
 
-export interface IPolicy {
-  clientNo: number;
-  policyCode: string;
-  policyName: string;
-  policyNo: number;
+export interface IBenefitItem {
+  benefitItemCode: string;
+  benefitItemName: string;
+  benefitItemNo: number;
+  benefitNo: number;
   remark: string;
+  budgetAmount: number;
 }
 
 export interface FormProps {
   benefits: IBenefit[];
-  clients: IClient[];
   visible: boolean;
   onCancel: () => void;
   onOk: () => void;
@@ -22,14 +21,13 @@ export interface FormProps {
 
 export interface UpdateFormProps {
   benefits: IBenefit[];
-  clients: IClient[];
   viewMode: boolean;
   visible: boolean;
   onCancel: () => void;
   onOk: () => void;
   confirmLoading: boolean;
   form: FormInstance;
-  currentRowData: IPolicy;
+  currentRowData: IBenefitItem;
 }
 
 export interface QueryParams {

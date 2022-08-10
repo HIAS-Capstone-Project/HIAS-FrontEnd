@@ -1,4 +1,4 @@
-import { Form, Input, Modal, Select } from 'antd';
+import { Checkbox, Form, Input, Modal, Select } from 'antd';
 import { useEffect } from 'react';
 import { UpdateFormProps } from '../types';
 
@@ -12,7 +12,15 @@ const EditPolicyForm = (props: UpdateFormProps) => {
     currentRowData,
     viewMode,
     clients,
+    benefits,
   } = props;
+
+  const options = benefits.map(benefit => {
+    return {
+      label: benefit.benefitName,
+      value: benefit.benefitNo,
+    };
+  });
 
   useEffect(() => {
     form.setFieldsValue(currentRowData);
@@ -63,17 +71,6 @@ const EditPolicyForm = (props: UpdateFormProps) => {
             showSearch
             size="large"
             placeholder="Chọn tên doanh nghiệp"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option!.children as unknown as string).includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              (optionA!.children as unknown as string)
-                .toLowerCase()
-                .localeCompare(
-                  (optionB!.children as unknown as string).toLowerCase(),
-                )
-            }
           >
             {clients.map(client => {
               return (
@@ -83,6 +80,16 @@ const EditPolicyForm = (props: UpdateFormProps) => {
               );
             })}
           </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="benefitNos"
+          label="Chọn các quyền lợi:"
+          rules={[
+            { required: true, message: 'Hãy chọn ít nhất một quyền lợi!' },
+          ]}
+        >
+          <Checkbox.Group options={options} />
         </Form.Item>
 
         <Form.Item name="remark" label="Ghi chú:">

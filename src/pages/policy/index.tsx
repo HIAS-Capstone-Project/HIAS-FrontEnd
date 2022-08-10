@@ -11,9 +11,11 @@ import {
 } from 'antd';
 import Column from 'antd/lib/table/Column';
 import _ from 'lodash';
+import { IBenefit } from 'pages/benefit/types';
 import { IClient } from 'pages/client/types';
-import { MouseEvent, useEffect, useState } from 'react';
-import { getClients } from 'services/client.service';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { getAllBenefit } from 'services/benefit.service';
+import { getAllClient } from 'services/client.service';
 import {
   addPolicy,
   deletePolicy,
@@ -67,6 +69,7 @@ const PolicyPage = () => {
 
   const [key, setKey] = useState<string>('');
   const [clients, setClients] = useState<IClient[]>([]);
+  const [benefits, setBenefits] = useState<IBenefit[]>([]);
 
   const {
     policyList,
@@ -77,6 +80,16 @@ const PolicyPage = () => {
     editPolicyModalLoading,
     viewMode,
   } = policyPageState;
+
+  const dataSource = useMemo(() => {
+    return policyList.map(policy => {
+      return {
+        ...policy,
+        clientName: clients.find(item => item.clientNo === policy.clientNo)
+          ?.clientName,
+      };
+    });
+  }, [clients, policyList]);
 
   const getPolicyList = async (params: QueryParams = {}) => {
     getPolicies(params).then(res => {
@@ -105,16 +118,26 @@ const PolicyPage = () => {
     });
   };
 
-  const getClientList = async (params: QueryParams = {}) => {
-    getClients(params).then(res => {
+  const getClientList = async () => {
+    getAllClient().then(res => {
       if (res) {
-        if (_.isEmpty(res.rows)) return;
-        setClients(res.rows);
+        if (_.isEmpty(res)) return;
+        setClients(res);
+      }
+    });
+  };
+
+  const getBenefitList = async () => {
+    getAllBenefit().then(res => {
+      if (res) {
+        if (_.isEmpty(res)) return;
+        setBenefits(res);
       }
     });
   };
   useEffect(() => {
     getPolicyList({ pagination });
+    getBenefitList();
     getClientList();
   }, []);
 
@@ -123,10 +146,10 @@ const PolicyPage = () => {
   };
 
   const handleAddPolicyOK = async () => {
-    setPolicyPageState({ ...policyPageState, addPolicyModalLoading: true });
     formAdd.validateFields().then(() => {
       const fieldValue = formAdd.getFieldsValue();
-
+      setPolicyPageState({ ...policyPageState, addPolicyModalLoading: true });
+      fieldValue.policyCode = fieldValue.policyCode.trim();
       addPolicy(fieldValue)
         .then(res => {
           formAdd.resetFields();
@@ -135,7 +158,13 @@ const PolicyPage = () => {
         .catch(e => {
           const { httpStatus, fieldName, errorMessage } = e.response.data;
           if (httpStatus === NOT_ACCEPTABLE) {
-            formAdd.setFields([{ name: fieldName, errors: [errorMessage] }]);
+            formAdd.setFields([
+              {
+                name: fieldName,
+                errors: [errorMessage],
+                value: formAdd.getFieldValue(fieldName)?.trim(),
+              },
+            ]);
           }
           setPolicyPageState({
             ...policyPageState,
@@ -164,13 +193,13 @@ const PolicyPage = () => {
       });
       return;
     }
-    setPolicyPageState({
-      ...policyPageState,
-      editPolicyModalLoading: true,
-    });
     formEdit.validateFields().then(() => {
       const fieldValue = formEdit.getFieldsValue();
-
+      setPolicyPageState({
+        ...policyPageState,
+        editPolicyModalLoading: true,
+        currentRowData: fieldValue,
+      });
       const value = {
         ...fieldValue,
         policyNo: currentRowData.policyNo,
@@ -261,7 +290,7 @@ const PolicyPage = () => {
           }}
           bordered
           rowKey="policyNo"
-          dataSource={policyList}
+          dataSource={dataSource}
           pagination={pagination}
           onChange={handleTableChange}
         >
@@ -275,6 +304,12 @@ const PolicyPage = () => {
             title="Tên chính sách"
             dataIndex="policyName"
             key="policyName"
+            align="center"
+          />
+          <Column
+            title="Tên doanh nghiệp"
+            dataIndex="clientName"
+            key="clientName"
             align="center"
           />
           <Column
@@ -304,6 +339,7 @@ const PolicyPage = () => {
         </Table>
       </Card>
       <EditPolicyForm
+        benefits={benefits}
         clients={clients}
         viewMode={viewMode}
         currentRowData={currentRowData}
@@ -314,6 +350,7 @@ const PolicyPage = () => {
         onOk={handleEditPolicyOK}
       />
       <AddPolicyForm
+        benefits={benefits}
         clients={clients}
         form={formAdd}
         visible={addPolicyModalVisible}
