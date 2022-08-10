@@ -9,12 +9,20 @@ export interface IEmployee {
   employeeName: string;
   employeeNo: number;
   phoneNumber: string;
+  employmentTypeNo: number;
 }
 
 export interface IDepartment {
   departmentCode: string;
   departmentName: string;
   departmentNo: number;
+  list: IEmploymentType[];
+}
+
+export interface IEmploymentType {
+  employmentTypeNo: number;
+  employmentTypeCode: string;
+  employmentTypeName: string;
 }
 
 export interface FormProps {
