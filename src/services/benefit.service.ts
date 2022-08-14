@@ -33,7 +33,7 @@ export const updateBenefit = async (param: IBenefit) => {
 
 export const deleteBenefit = async (benefitNo: number) => {
   const response = await httpProvider.delete<IBenefit>(
-    `benefit/delete?benefitNo=${benefitNo}`,
+    `benefit/delete/${benefitNo}`,
   );
   return response.data;
 };

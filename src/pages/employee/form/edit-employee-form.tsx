@@ -46,7 +46,10 @@ const EditEmployeeForm = (props: UpdateFormProps) => {
     <Modal
       title="Chỉnh sửa nhân viên"
       visible={visible}
-      onCancel={onCancel}
+      onCancel={() => {
+        onCancel();
+        setEmploymentTypes([]);
+      }}
       onOk={onOk}
       confirmLoading={confirmLoading}
       cancelText="Hủy"
@@ -60,11 +63,7 @@ const EditEmployeeForm = (props: UpdateFormProps) => {
         layout="vertical"
         disabled={viewMode}
       >
-        <Form.Item
-          name="employeeID"
-          label="Mã nhân viên:"
-          rules={[{ required: true, message: 'Hãy nhập vào mã nhân viên!' }]}
-        >
+        <Form.Item name="employeeID" label="Mã nhân viên:">
           <Input
             disabled
             autoComplete="false"
@@ -96,6 +95,7 @@ const EditEmployeeForm = (props: UpdateFormProps) => {
           ]}
         >
           <DatePicker
+            disabledDate={current => current.isAfter(moment())}
             placeholder="Ngày sinh"
             size="large"
             format={DateFormat.DDMMYYYY}

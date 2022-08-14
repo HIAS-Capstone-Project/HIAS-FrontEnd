@@ -3,6 +3,11 @@ import { IPolicyResponse } from 'models';
 import { IPolicy, QueryParams } from 'pages/policy/types';
 import queryString from 'query-string';
 
+export const getAllPolicy = async () => {
+  const response = await httpProvider.get<IPolicy[]>('policy/get-all');
+  return response.data;
+};
+
 export const getPolicies = async (params: QueryParams) => {
   const { pagination, key } = params;
   const query = {

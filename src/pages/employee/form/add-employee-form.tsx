@@ -1,7 +1,8 @@
 import { DatePicker, Form, Input, Modal, Select } from 'antd';
 import DateFormat from 'constants/date-format';
 import _ from 'lodash';
-import { IDepartment, IEmploymentType } from 'pages/employee/types';
+import moment from 'moment';
+import { IEmploymentType } from 'pages/employee/types';
 import { useState } from 'react';
 import { FormProps } from '../types';
 
@@ -13,7 +14,10 @@ const AddEmployeeForm = (props: FormProps) => {
     <Modal
       title="Thêm nhân viên"
       visible={visible}
-      onCancel={onCancel}
+      onCancel={() => {
+        onCancel();
+        setEmploymentTypes([]);
+      }}
       onOk={onOk}
       confirmLoading={confirmLoading}
       cancelText="Hủy"
@@ -56,6 +60,7 @@ const AddEmployeeForm = (props: FormProps) => {
           ]}
         >
           <DatePicker
+            disabledDate={current => current.isAfter(moment())}
             placeholder="Ngày sinh"
             size="large"
             format={DateFormat.DDMMYYYY}

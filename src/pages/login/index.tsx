@@ -36,26 +36,26 @@ const LoginPage = () => {
         <Form onFinish={handleLogin} className="login-form">
           <Form.Item
             name="username"
-            rules={[{ required: true, message: 'Please input your username!' }]}
+            rules={[{ required: true, message: 'Hãy nhập tên đăng nhập' }]}
           >
             <Input
               autoComplete="false"
               size="large"
               prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Username"
+              placeholder="Tên đăng nhập"
             />
           </Form.Item>
           <Form.Item
             name="password"
-            rules={[{ required: true, message: 'Please input your password!' }]}
+            rules={[{ required: true, message: 'Hãy nhập mật khẩu' }]}
           >
             <Input.Password
               size="large"
               prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Password"
+              placeholder="Mật khẩu"
             />
           </Form.Item>
-          <Form.Item style={{ marginBottom: '16px' }}>
+          {/* <Form.Item style={{ marginBottom: '16px' }}>
             <Form.Item
               name="isRemember"
               valuePropName="checked"
@@ -67,7 +67,7 @@ const LoginPage = () => {
             <a className={styles.forgotPassword} href="">
               Forgot your password?
             </a>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
             <Button
@@ -76,7 +76,7 @@ const LoginPage = () => {
               htmlType="submit"
               className={styles.loginButton}
             >
-              Log in
+              Đăng nhập
             </Button>
           </Form.Item>
         </Form>
