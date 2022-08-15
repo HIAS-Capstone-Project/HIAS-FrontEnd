@@ -1,14 +1,24 @@
 import { Layout } from 'antd';
 import 'antd/dist/antd.css';
+import { useAppSelector } from 'app/hooks';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import routes from 'routers';
 import Header from './header';
 import Sider from './sider';
+import Routes from 'constants/routes';
+import Links from 'pages/links';
+import { LocalStorageUtil } from 'utils';
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const [isFullPage, setFullPage] = useState<boolean | undefined>(false);
+  const user = useAppSelector(selectCurrentUser);
+  const session = LocalStorageUtil.getSessionInfo();
+  const isAuthenticate = session && !!session.token;
+  const navigate = useNavigate();
+  const index = user?.role ? user?.role : Routes.HOME;
 
   useEffect(() => {
     const currentRoute = routes.find(route => route.path === location.pathname);
@@ -17,17 +27,13 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   }, [location]);
 
-  // useEffect(() => {
-  //   httpProvider.setupInterceptors((status: number, res: HttpResponse<any>) => {
-  //     if (status === 401 || status === 403) {
-  //       const resetSession: ISession = {};
-  //       LocalStorageUtil.setSessionInfo(resetSession);
-  //       if (window.location.href.includes(Routes.LOGIN)) return;
-  //       window.location.href = Routes.LOGIN;
-  //       return;
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    if (!isAuthenticate) {
+      navigate(Routes.LOGIN);
+    } else if (location.pathname === '/login') {
+      navigate(Links[index][0].to);
+    }
+  }, [isAuthenticate, navigate]);
 
   if (isFullPage) return <>{children}</>;
 
