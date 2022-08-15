@@ -1,10 +1,10 @@
-import React from 'react';
 import { Layout } from 'antd';
 import { useAppSelector } from 'app/hooks';
-import { selectLayout } from 'features/layout/layoutSlice';
+import HeaderAvatar from 'components/avatar';
 import Hamburger from 'components/hamburger';
-const { Header } = Layout;
+import { selectLayout } from 'features/layout/layoutSlice';
 import styles from './header.module.css';
+const { Header } = Layout;
 
 const LayoutHeader = () => {
   const layout = useAppSelector(selectLayout);
@@ -29,6 +29,7 @@ const LayoutHeader = () => {
         className={`${styles.antLayoutHeader} ${styles.fixHeader}`}
       >
         <Hamburger />
+        <HeaderAvatar />
       </Header>
     </>
   );

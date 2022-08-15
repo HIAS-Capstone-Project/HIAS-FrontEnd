@@ -34,6 +34,7 @@ const authSilce = createSlice({
     },
     logOut: state => {
       state.user = null;
+      LocalStorageUtil.removeSessionInfo();
     },
   },
   extraReducers: builder => {

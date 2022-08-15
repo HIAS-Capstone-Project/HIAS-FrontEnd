@@ -4,4 +4,5 @@ export interface ILoginResponse {
   have_not_permission?: boolean;
   role?: string;
   token_type?: string;
+  primary_key?: number;
 }
