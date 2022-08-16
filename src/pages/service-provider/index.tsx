@@ -9,6 +9,8 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import ConfirmDialog from 'components/confirm-dialog';
+import { openNotificationWithIcon } from 'components/notification';
 import DateFormat from 'constants/date-format';
 import { QueryParams } from 'pages/service-provider/types';
 import { MouseEvent, useEffect, useState } from 'react';
@@ -31,6 +33,7 @@ interface ServiceProviderPageState {
   addServiceProviderModalVisible: boolean;
   addServiceProviderModalLoading: boolean;
   viewMode: boolean;
+  deleteModelVisible: boolean;
 }
 
 const ServiceProviderPage = () => {
@@ -45,6 +48,7 @@ const ServiceProviderPage = () => {
     addServiceProviderModalVisible: false,
     addServiceProviderModalLoading: false,
     viewMode: false,
+    deleteModelVisible: false,
   };
 
   const [serviceProviderPageState, setServiceProviderPageState] =
@@ -74,6 +78,7 @@ const ServiceProviderPage = () => {
     addServiceProviderModalVisible,
     addServiceProviderModalLoading,
     viewMode,
+    deleteModelVisible,
   } = serviceProviderPageState;
 
   const getServiceProviderList = async (params: QueryParams = {}) => {
@@ -87,6 +92,7 @@ const ServiceProviderPage = () => {
           editServiceProviderModalLoading: false,
           editServiceProviderModalVisible: false,
           viewMode: false,
+          deleteModelVisible: false,
         });
         setPagination({
           ...pagination,
@@ -135,6 +141,12 @@ const ServiceProviderPage = () => {
       saveServiceProvider(value)
         .then(res => {
           formAdd.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thêm cơ sở khám chữa bệnh thành công',
+            `Cơ sở khám chữa bệnh có mã ${value.serviceProviderID} đã được thêm mới`,
+            'bottomLeft',
+          );
           getServiceProviderList({ pagination });
         })
         .catch(e => {
@@ -194,6 +206,12 @@ const ServiceProviderPage = () => {
       delete value.timeRange;
       formEdit.resetFields();
       saveServiceProvider(value).then(res => {
+        openNotificationWithIcon(
+          'success',
+          'Chỉnh sửa cơ sở khám chữa bệnh thành công',
+          `Cơ sở khám chữa bệnh có mã ${currentRowData.serviceProviderID} đã được cập nhật`,
+          'bottomLeft',
+        );
         getServiceProviderList({ pagination });
       });
     });
@@ -208,9 +226,19 @@ const ServiceProviderPage = () => {
     getServiceProviderList({ pagination, key: value });
   };
 
-  const handleDeleteServiceProvider = async (serviceProviderNo: number) => {
-    await deleteServiceProvider(serviceProviderNo);
-    getServiceProviderList({ pagination });
+  const handleDeleteServiceProvider = async (
+    serviceProviderNo: number,
+    serviceProviderID: string,
+  ) => {
+    await deleteServiceProvider(serviceProviderNo).then(() => {
+      openNotificationWithIcon(
+        'error',
+        'Xóa cơ sở khám chữa bệnh thành công',
+        `Cơ sở khám chữa bệnh có mã ${serviceProviderID} đã được xóa`,
+        'bottomLeft',
+      );
+      getServiceProviderList({ pagination });
+    });
   };
 
   const title = (
@@ -305,7 +333,11 @@ const ServiceProviderPage = () => {
                   style={{ fontSize: '150%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    handleDeleteServiceProvider(row.serviceProviderNo);
+                    setServiceProviderPageState({
+                      ...serviceProviderPageState,
+                      currentRowData: row,
+                      deleteModelVisible: true,
+                    });
                   }}
                 />
               </span>
@@ -329,6 +361,24 @@ const ServiceProviderPage = () => {
         confirmLoading={addServiceProviderModalLoading}
         onCancel={handleCancel}
         onOk={handleAddServiceProviderOK}
+      />
+      <ConfirmDialog
+        visible={deleteModelVisible}
+        title="Xóa cơ sở khám chữa bệnh"
+        content={`Bạn có đồng ý xóa cơ sở khám chữa bệnh ${currentRowData.serviceProviderName} hay không?`}
+        onOK={() =>
+          handleDeleteServiceProvider(
+            currentRowData.serviceProviderNo,
+            currentRowData.serviceProviderID,
+          )
+        }
+        onCancel={() =>
+          setServiceProviderPageState({
+            ...serviceProviderPageState,
+            currentRowData: {} as IServiceProvider,
+            deleteModelVisible: false,
+          })
+        }
       />
     </div>
   );

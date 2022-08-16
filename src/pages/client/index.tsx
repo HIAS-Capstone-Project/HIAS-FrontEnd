@@ -9,6 +9,8 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import ConfirmDialog from 'components/confirm-dialog';
+import { openNotificationWithIcon } from 'components/notification';
 import { MouseEvent, useEffect, useState } from 'react';
 import {
   addClient,
@@ -16,10 +18,10 @@ import {
   getClients,
   updateClient,
 } from 'services/client.service';
+import { NOT_ACCEPTABLE } from './../../constants';
 import AddClientForm from './forms/add-client-form';
 import EditClientForm from './forms/edit-client-form';
 import { IClient, QueryParams } from './types';
-import { NOT_ACCEPTABLE } from './../../constants';
 const { Column } = Table;
 
 interface ClientPageState {
@@ -30,6 +32,7 @@ interface ClientPageState {
   addClientModalVisible: boolean;
   addClientModalLoading: boolean;
   viewMode: boolean;
+  deleteModelVisible: boolean;
 }
 
 const ClientPage = () => {
@@ -44,6 +47,7 @@ const ClientPage = () => {
     addClientModalVisible: false,
     addClientModalLoading: false,
     viewMode: false,
+    deleteModelVisible: false,
   };
 
   const [clientPageState, setClientPageState] =
@@ -72,6 +76,7 @@ const ClientPage = () => {
     editClientModalVisible,
     editClientModalLoading,
     viewMode,
+    deleteModelVisible,
   } = clientPageState;
 
   const getClientList = async (params: QueryParams = {}) => {
@@ -85,6 +90,7 @@ const ClientPage = () => {
           editClientModalLoading: false,
           editClientModalVisible: false,
           viewMode: false,
+          deleteModelVisible: false,
         });
         setPagination({
           ...pagination,
@@ -116,6 +122,12 @@ const ClientPage = () => {
       addClient(fieldValue)
         .then(res => {
           formAdd.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thêm doanh nghiệp thành công',
+            `Doanh nghiệp có mã ${fieldValue.corporateID} đã được thêm mới`,
+            'bottomLeft',
+          );
           getClientList({ pagination });
         })
         .catch(e => {
@@ -168,6 +180,12 @@ const ClientPage = () => {
       };
 
       updateClient(value).then(res => {
+        openNotificationWithIcon(
+          'success',
+          'Chỉnh sửa doanh nghiệp thành công',
+          `Doanh nghiệp có mã ${currentRowData.corporateID} đã được cập nhật`,
+          'bottomLeft',
+        );
         getClientList({ pagination });
       });
       formEdit.resetFields();
@@ -183,9 +201,16 @@ const ClientPage = () => {
     getClientList({ pagination, key: value });
   };
 
-  const handleDeleteClient = async (clientNo: number) => {
-    await deleteClient(clientNo);
-    getClientList({ pagination });
+  const handleDeleteClient = async (clientNo: number, corporateID: string) => {
+    await deleteClient(clientNo).then(() => {
+      openNotificationWithIcon(
+        'error',
+        'Xóa doanh nghiệp thành công',
+        `Doanh nghiệp có mã ${corporateID} đã được xóa`,
+        'bottomLeft',
+      );
+      getClientList({ pagination });
+    });
   };
 
   const title = (
@@ -286,7 +311,11 @@ const ClientPage = () => {
                   style={{ fontSize: '150%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    handleDeleteClient(row.clientNo);
+                    setClientPageState({
+                      ...clientPageState,
+                      currentRowData: row,
+                      deleteModelVisible: true,
+                    });
                   }}
                 />
               </span>
@@ -309,6 +338,24 @@ const ClientPage = () => {
         confirmLoading={addClientModalLoading}
         onCancel={handleCancel}
         onOk={handleAddClientOK}
+      />
+      <ConfirmDialog
+        visible={deleteModelVisible}
+        title="Xóa doanh nghiệp"
+        content={`Bạn có đồng ý xóa doanh nghiệp ${currentRowData.clientName} hay không?`}
+        onOK={() =>
+          handleDeleteClient(
+            currentRowData.clientNo,
+            currentRowData.corporateID,
+          )
+        }
+        onCancel={() =>
+          setClientPageState({
+            ...clientPageState,
+            currentRowData: {} as IClient,
+            deleteModelVisible: false,
+          })
+        }
       />
     </div>
   );

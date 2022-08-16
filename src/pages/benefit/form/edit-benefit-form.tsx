@@ -1,4 +1,4 @@
-import { Form, Input, Modal } from 'antd';
+import { Checkbox, Form, Input, Modal } from 'antd';
 import { useEffect } from 'react';
 import { UpdateFormProps } from '../types';
 
@@ -11,7 +11,15 @@ const EditBenefitForm = (props: UpdateFormProps) => {
     confirmLoading,
     currentRowData,
     viewMode,
+    licenses,
   } = props;
+
+  const options = licenses.map(license => {
+    return {
+      label: license.licenseName,
+      value: license.licenseNo,
+    };
+  });
 
   useEffect(() => {
     form.setFieldsValue(currentRowData);
@@ -58,6 +66,19 @@ const EditBenefitForm = (props: UpdateFormProps) => {
             size="large"
             placeholder="Nhập vào tên quyền lợi"
           />
+        </Form.Item>
+        <Form.Item
+          name="licenseNos"
+          label="Chọn các giấy tờ liên quan:"
+          rules={[
+            {
+              required: true,
+              message:
+                'Hãy chọn ít nhất một loại giấy tờ cần thiết cho quyền lợi!',
+            },
+          ]}
+        >
+          <Checkbox.Group options={options} />
         </Form.Item>
         <Form.Item name="remark" label="Ghi chú:">
           <Input.TextArea

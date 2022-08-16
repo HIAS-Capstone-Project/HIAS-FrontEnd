@@ -9,6 +9,9 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import ConfirmDialog from 'components/confirm-dialog';
+import { openNotificationWithIcon } from 'components/notification';
+import _ from 'lodash';
 import { MouseEvent, useEffect, useState } from 'react';
 import {
   addBenefit,
@@ -16,7 +19,9 @@ import {
   getBenefits,
   updateBenefit,
 } from 'services/benefit.service';
+import { getAllLicense } from 'services/license.service';
 import { NOT_ACCEPTABLE } from './../../constants';
+import { ILicense } from './../../models/license/types';
 import AddBenefitForm from './form/add-benefit-form';
 import EditBenefitForm from './form/edit-benefit-form';
 import { IBenefit, QueryParams } from './types';
@@ -30,6 +35,7 @@ interface BenefitPageState {
   addBenefitModalVisible: boolean;
   addBenefitModalLoading: boolean;
   viewMode: boolean;
+  deleteModelVisible: boolean;
 }
 
 const BenefitPage = () => {
@@ -44,6 +50,7 @@ const BenefitPage = () => {
     addBenefitModalVisible: false,
     addBenefitModalLoading: false,
     viewMode: false,
+    deleteModelVisible: false,
   };
 
   const [benefitPageState, setBenefitPageState] =
@@ -63,6 +70,7 @@ const BenefitPage = () => {
   });
 
   const [key, setKey] = useState<string>('');
+  const [licenses, setLicenses] = useState<ILicense[]>([]);
 
   const {
     benefitList,
@@ -72,6 +80,7 @@ const BenefitPage = () => {
     editBenefitModalVisible,
     editBenefitModalLoading,
     viewMode,
+    deleteModelVisible,
   } = benefitPageState;
 
   const getBenefitList = async (params: QueryParams = {}) => {
@@ -85,6 +94,7 @@ const BenefitPage = () => {
           editBenefitModalLoading: false,
           editBenefitModalVisible: false,
           viewMode: false,
+          deleteModelVisible: false,
         });
         setPagination({
           ...pagination,
@@ -100,8 +110,19 @@ const BenefitPage = () => {
       }
     });
   };
+
+  const getLicenseList = async () => {
+    getAllLicense().then(res => {
+      if (res) {
+        if (_.isEmpty(res)) return;
+        setLicenses(res);
+      }
+    });
+  };
+
   useEffect(() => {
     getBenefitList({ pagination });
+    getLicenseList();
   }, []);
 
   const handleAddBenefit = () => {
@@ -119,6 +140,12 @@ const BenefitPage = () => {
       addBenefit(fieldValue)
         .then(res => {
           formAdd.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thêm quyền lợi thành công',
+            `Quyền lợi có mã ${fieldValue.benefitCode} đã được thêm mới`,
+            'bottomLeft',
+          );
           getBenefitList({ pagination });
         })
         .catch(e => {
@@ -171,6 +198,12 @@ const BenefitPage = () => {
 
       formEdit.resetFields();
       updateBenefit(value).then(res => {
+        openNotificationWithIcon(
+          'success',
+          'Chỉnh sửa quyền lợi thành công',
+          `Quyền lợi có mã ${currentRowData.benefitCode} đã được cập nhật`,
+          'bottomLeft',
+        );
         getBenefitList({ pagination });
       });
     });
@@ -185,9 +218,19 @@ const BenefitPage = () => {
     getBenefitList({ pagination, key: value });
   };
 
-  const handleDeleteBenefit = async (benefitNo: number) => {
-    await deleteBenefit(benefitNo);
-    getBenefitList({ pagination });
+  const handleDeleteBenefit = async (
+    benefitNo: number,
+    benefitCode: string,
+  ) => {
+    await deleteBenefit(benefitNo).then(() => {
+      openNotificationWithIcon(
+        'error',
+        'Xóa quyền lợi thành công',
+        `Quyền lợi có mã ${benefitCode} đã được xóa`,
+        'bottomLeft',
+      );
+      getBenefitList({ pagination });
+    });
   };
 
   const title = (
@@ -275,7 +318,11 @@ const BenefitPage = () => {
                   style={{ fontSize: '150%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    handleDeleteBenefit(row.benefitNo);
+                    setBenefitPageState({
+                      ...benefitPageState,
+                      currentRowData: row,
+                      deleteModelVisible: true,
+                    });
                   }}
                 />
               </span>
@@ -284,6 +331,7 @@ const BenefitPage = () => {
         </Table>
       </Card>
       <EditBenefitForm
+        licenses={licenses}
         viewMode={viewMode}
         currentRowData={currentRowData}
         form={formEdit}
@@ -293,11 +341,30 @@ const BenefitPage = () => {
         onOk={handleEditBenefitOK}
       />
       <AddBenefitForm
+        licenses={licenses}
         form={formAdd}
         visible={addBenefitModalVisible}
         confirmLoading={addBenefitModalLoading}
         onCancel={handleCancel}
         onOk={handleAddBenefitOK}
+      />
+      <ConfirmDialog
+        visible={deleteModelVisible}
+        title="Xóa quyền lợi"
+        content={`Bạn có đồng ý xóa quyền lợi ${currentRowData.benefitName} hay không?`}
+        onOK={() =>
+          handleDeleteBenefit(
+            currentRowData.benefitNo,
+            currentRowData.benefitCode,
+          )
+        }
+        onCancel={() =>
+          setBenefitPageState({
+            ...benefitPageState,
+            currentRowData: {} as IBenefit,
+            deleteModelVisible: false,
+          })
+        }
       />
     </div>
   );

@@ -10,6 +10,8 @@ import {
   TablePaginationConfig,
 } from 'antd';
 import Column from 'antd/lib/table/Column';
+import ConfirmDialog from 'components/confirm-dialog';
+import { openNotificationWithIcon } from 'components/notification';
 import _ from 'lodash';
 import { IBenefit } from 'pages/benefit/types';
 import { IClient } from 'pages/client/types';
@@ -35,6 +37,7 @@ interface IPolicyPageState {
   addPolicyModalVisible: boolean;
   addPolicyModalLoading: boolean;
   viewMode: boolean;
+  deleteModelVisible: boolean;
 }
 
 const PolicyPage = () => {
@@ -49,6 +52,7 @@ const PolicyPage = () => {
     addPolicyModalVisible: false,
     addPolicyModalLoading: false,
     viewMode: false,
+    deleteModelVisible: false,
   };
 
   const [policyPageState, setPolicyPageState] =
@@ -79,6 +83,7 @@ const PolicyPage = () => {
     editPolicyModalVisible,
     editPolicyModalLoading,
     viewMode,
+    deleteModelVisible,
   } = policyPageState;
 
   const dataSource = useMemo(() => {
@@ -102,6 +107,7 @@ const PolicyPage = () => {
           editPolicyModalLoading: false,
           editPolicyModalVisible: false,
           viewMode: false,
+          deleteModelVisible: false,
         });
         setPagination({
           ...pagination,
@@ -153,6 +159,12 @@ const PolicyPage = () => {
       addPolicy(fieldValue)
         .then(res => {
           formAdd.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thêm chính sách thành công',
+            `Chính sách có mã ${fieldValue.policyCode} đã được thêm mới`,
+            'bottomLeft',
+          );
           getPolicyList({ pagination });
         })
         .catch(e => {
@@ -208,6 +220,12 @@ const PolicyPage = () => {
       formEdit.resetFields();
       updatePolicy(value)
         .then(res => {
+          openNotificationWithIcon(
+            'success',
+            'Chỉnh sửa chính sách thành công',
+            `Chính sách có mã ${currentRowData.policyCode} đã được cập nhật`,
+            'bottomLeft',
+          );
           getPolicyList({ pagination });
         })
         .catch(e => {
@@ -234,9 +252,16 @@ const PolicyPage = () => {
     getPolicyList({ pagination, key: value });
   };
 
-  const handleDeletePolicy = async (policyNo: number) => {
-    await deletePolicy(policyNo);
-    getPolicyList({ pagination });
+  const handleDeletePolicy = async (policyNo: number, policyCode: string) => {
+    await deletePolicy(policyNo).then(() => {
+      openNotificationWithIcon(
+        'error',
+        'Xóa chính sách thành công',
+        `Chính sách có mã ${policyCode} đã được xóa`,
+        'bottomLeft',
+      );
+      getPolicyList({ pagination });
+    });
   };
 
   const title = (
@@ -330,7 +355,11 @@ const PolicyPage = () => {
                   style={{ fontSize: '150%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    handleDeletePolicy(row.policyNo);
+                    setPolicyPageState({
+                      ...policyPageState,
+                      currentRowData: row,
+                      deleteModelVisible: true,
+                    });
                   }}
                 />
               </span>
@@ -357,6 +386,21 @@ const PolicyPage = () => {
         confirmLoading={addPolicyModalLoading}
         onCancel={handleCancel}
         onOk={handleAddPolicyOK}
+      />
+      <ConfirmDialog
+        visible={deleteModelVisible}
+        title="Xóa chính sách"
+        content={`Bạn có đồng ý xóa chính sách ${currentRowData.policyName} hay không?`}
+        onOK={() =>
+          handleDeletePolicy(currentRowData.policyNo, currentRowData.policyCode)
+        }
+        onCancel={() =>
+          setPolicyPageState({
+            ...policyPageState,
+            currentRowData: {} as IPolicy,
+            deleteModelVisible: false,
+          })
+        }
       />
     </div>
   );

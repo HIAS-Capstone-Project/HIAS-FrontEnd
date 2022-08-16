@@ -1,13 +1,16 @@
 import { FormInstance, TablePaginationConfig } from 'antd';
+import { ILicense } from './../../models/license/types';
 
 export interface IBenefit {
   benefitCode: string;
   benefitName: string;
   benefitNo: number;
   remark: string;
+  licenseNos: number[];
 }
 
 export interface FormProps {
+  licenses: ILicense[];
   visible: boolean;
   onCancel: () => void;
   onOk: () => void;
@@ -16,6 +19,7 @@ export interface FormProps {
 }
 
 export interface UpdateFormProps {
+  licenses: ILicense[];
   viewMode: boolean;
   visible: boolean;
   onCancel: () => void;

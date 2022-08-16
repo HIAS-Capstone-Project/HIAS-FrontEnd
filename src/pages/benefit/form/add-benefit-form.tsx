@@ -1,8 +1,15 @@
-import { Form, Input, Modal } from 'antd';
+import { Checkbox, Form, Input, Modal } from 'antd';
 import { FormProps } from '../types';
 
 const AddBenefitForm = (props: FormProps) => {
-  const { form, visible, onCancel, onOk, confirmLoading } = props;
+  const { form, visible, onCancel, onOk, confirmLoading, licenses } = props;
+
+  const options = licenses.map(license => {
+    return {
+      label: license.licenseName,
+      value: license.licenseNo,
+    };
+  });
 
   return (
     <Modal
@@ -37,6 +44,19 @@ const AddBenefitForm = (props: FormProps) => {
             size="large"
             placeholder="Nhập vào tên quyền lợi"
           />
+        </Form.Item>
+        <Form.Item
+          name="licenseNos"
+          label="Chọn các giấy tờ liên quan:"
+          rules={[
+            {
+              required: true,
+              message:
+                'Hãy chọn ít nhất một loại giấy tờ cần thiết cho quyền lợi!',
+            },
+          ]}
+        >
+          <Checkbox.Group options={options} />
         </Form.Item>
         <Form.Item name="remark" label="Ghi chú:">
           <Input.TextArea

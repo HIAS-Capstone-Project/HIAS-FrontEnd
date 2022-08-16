@@ -10,6 +10,8 @@ import {
   TablePaginationConfig,
 } from 'antd';
 import Column from 'antd/lib/table/Column';
+import ConfirmDialog from 'components/confirm-dialog';
+import { openNotificationWithIcon } from 'components/notification';
 import DateFormat from 'constants/date-format';
 import _ from 'lodash';
 import moment from 'moment';
@@ -35,6 +37,7 @@ interface IEmployeePageState {
   addEmployeeModalVisible: boolean;
   addEmployeeModalLoading: boolean;
   viewMode: boolean;
+  deleteModelVisible: boolean;
 }
 
 const EmployeePage = () => {
@@ -49,6 +52,7 @@ const EmployeePage = () => {
     addEmployeeModalVisible: false,
     addEmployeeModalLoading: false,
     viewMode: false,
+    deleteModelVisible: false,
   };
 
   const [employeePageState, setEmployeePageState] =
@@ -75,6 +79,7 @@ const EmployeePage = () => {
     editEmployeeModalVisible,
     editEmployeeModalLoading,
     viewMode,
+    deleteModelVisible,
   } = employeePageState;
 
   const [key, setKey] = useState<string>('');
@@ -106,6 +111,7 @@ const EmployeePage = () => {
           editEmployeeModalLoading: false,
           editEmployeeModalVisible: false,
           viewMode: false,
+          deleteModelVisible: false,
         });
         setPagination({
           ...pagination,
@@ -171,6 +177,12 @@ const EmployeePage = () => {
       addEmployee(value)
         .then(res => {
           formAdd.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thêm nhân viên thành công',
+            `Nhân viên có mã ${value.employeeID} đã được thêm mới`,
+            'bottomLeft',
+          );
           getEmployeeList({ pagination });
         })
         .catch(e => {
@@ -227,6 +239,12 @@ const EmployeePage = () => {
       formEdit.resetFields();
       updateEmployee(value)
         .then(res => {
+          openNotificationWithIcon(
+            'success',
+            'Chỉnh sửa nhân viên thành công',
+            `Nhân viên có mã ${currentRowData.employeeID} đã được cập nhật`,
+            'bottomLeft',
+          );
           getEmployeeList({ pagination });
         })
         .catch(e => {
@@ -252,9 +270,19 @@ const EmployeePage = () => {
     getEmployeeList({ pagination, key: value });
   };
 
-  const handleDeleteEmployee = async (employeeNo: number) => {
-    await deleteEmployee(employeeNo);
-    getEmployeeList({ pagination });
+  const handleDeleteEmployee = async (
+    employeeNo: number,
+    employeeID: string,
+  ) => {
+    await deleteEmployee(employeeNo).then(() => {
+      openNotificationWithIcon(
+        'error',
+        'Xóa nhân viên thành công',
+        `Nhân viên có mã ${employeeID} đã được xóa`,
+        'bottomLeft',
+      );
+      getEmployeeList({ pagination });
+    });
   };
 
   const title = (
@@ -368,7 +396,11 @@ const EmployeePage = () => {
                   style={{ fontSize: '150%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    handleDeleteEmployee(row.employeeNo);
+                    setEmployeePageState({
+                      ...employeePageState,
+                      currentRowData: row,
+                      deleteModelVisible: true,
+                    });
                   }}
                 />
               </span>
@@ -393,6 +425,24 @@ const EmployeePage = () => {
         confirmLoading={addEmployeeModalLoading}
         onCancel={handleCancel}
         onOk={handleAddEmployeeOK}
+      />
+      <ConfirmDialog
+        visible={deleteModelVisible}
+        title="Xóa nhân viên"
+        content={`Bạn có đồng ý xóa nhân viên ${currentRowData.employeeName} hay không?`}
+        onOK={() =>
+          handleDeleteEmployee(
+            currentRowData.employeeNo,
+            currentRowData.employeeID,
+          )
+        }
+        onCancel={() =>
+          setEmployeePageState({
+            ...employeePageState,
+            currentRowData: {} as IEmployee,
+            deleteModelVisible: false,
+          })
+        }
       />
     </div>
   );

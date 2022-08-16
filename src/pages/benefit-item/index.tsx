@@ -9,6 +9,8 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import ConfirmDialog from 'components/confirm-dialog';
+import { openNotificationWithIcon } from 'components/notification';
 import { NOT_ACCEPTABLE } from 'constants/http-status';
 import _ from 'lodash';
 import { IBenefit } from 'pages/benefit/types';
@@ -33,6 +35,7 @@ interface IBenefitItemPageState {
   addBenefitItemModalVisible: boolean;
   addBenefitItemModalLoading: boolean;
   viewMode: boolean;
+  deleteModelVisible: boolean;
 }
 
 const BenefitItemPage = () => {
@@ -47,6 +50,7 @@ const BenefitItemPage = () => {
     addBenefitItemModalVisible: false,
     addBenefitItemModalLoading: false,
     viewMode: false,
+    deleteModelVisible: false,
   };
 
   const [benefitItemPageState, setBenefitItemPageState] =
@@ -76,6 +80,7 @@ const BenefitItemPage = () => {
     editBenefitItemModalVisible,
     editBenefitItemModalLoading,
     viewMode,
+    deleteModelVisible,
   } = benefitItemPageState;
 
   const dataSource = useMemo(() => {
@@ -100,6 +105,7 @@ const BenefitItemPage = () => {
           editBenefitItemModalLoading: false,
           editBenefitItemModalVisible: false,
           viewMode: false,
+          deleteModelVisible: false,
         });
         setPagination({
           ...pagination,
@@ -148,6 +154,12 @@ const BenefitItemPage = () => {
       addBenefitItem(fieldValue)
         .then(res => {
           formAdd.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thêm danh mục quyền lợi thành công',
+            `Danh mục quyền lợi có mã ${fieldValue.benefitItemCode} đã được thêm mới`,
+            'bottomLeft',
+          );
           getBenefitItemList({ pagination });
         })
         .catch(e => {
@@ -200,6 +212,12 @@ const BenefitItemPage = () => {
       };
 
       updateBenefitItem(value).then(res => {
+        openNotificationWithIcon(
+          'success',
+          'Chỉnh sửa danh mục quyền lợi thành công',
+          `Danh mục quyền lợi có mã ${currentRowData.benefitItemCode} đã được cập nhật`,
+          'bottomLeft',
+        );
         getBenefitItemList({ pagination });
       });
       formEdit.resetFields();
@@ -215,9 +233,19 @@ const BenefitItemPage = () => {
     getBenefitItemList({ pagination, key: value });
   };
 
-  const handleDeleteBenefitItem = async (benefitItemNo: number) => {
-    await deleteBenefitItem(benefitItemNo);
-    getBenefitItemList({ pagination });
+  const handleDeleteBenefitItem = async (
+    benefitItemNo: number,
+    benefitItemCode: string,
+  ) => {
+    await deleteBenefitItem(benefitItemNo).then(() => {
+      openNotificationWithIcon(
+        'error',
+        'Xóa danh mục quyền lợi thành công',
+        `Danh mục quyền lợi có mã ${benefitItemCode} đã được xóa`,
+        'bottomLeft',
+      );
+      getBenefitItemList({ pagination });
+    });
   };
 
   const title = (
@@ -320,7 +348,11 @@ const BenefitItemPage = () => {
                   style={{ fontSize: '150%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    handleDeleteBenefitItem(row.benefitItemNo);
+                    setBenefitItemPageState({
+                      ...benefitItemPageState,
+                      currentRowData: row,
+                      deleteModelVisible: true,
+                    });
                   }}
                 />
               </span>
@@ -345,6 +377,24 @@ const BenefitItemPage = () => {
         confirmLoading={addBenefitItemModalLoading}
         onCancel={handleCancel}
         onOk={handleAddBenefitItemOK}
+      />
+      <ConfirmDialog
+        visible={deleteModelVisible}
+        title="Xóa danh mục quyền lợi"
+        content={`Bạn có đồng ý xóa danh mục quyền lợi ${currentRowData.benefitItemName} hay không?`}
+        onOK={() =>
+          handleDeleteBenefitItem(
+            currentRowData.benefitItemNo,
+            currentRowData.benefitItemCode,
+          )
+        }
+        onCancel={() =>
+          setBenefitItemPageState({
+            ...benefitItemPageState,
+            currentRowData: {} as IBenefitItem,
+            deleteModelVisible: false,
+          })
+        }
       />
     </div>
   );

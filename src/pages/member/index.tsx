@@ -9,6 +9,8 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import ConfirmDialog from 'components/confirm-dialog';
+import { openNotificationWithIcon } from 'components/notification';
 import DateFormat from 'constants/date-format';
 import { NOT_ACCEPTABLE } from 'constants/http-status';
 import _ from 'lodash';
@@ -40,6 +42,7 @@ interface IMemberPageState {
   addMemberModalVisible: boolean;
   addMemberModalLoading: boolean;
   viewMode: boolean;
+  deleteModelVisible: boolean;
 }
 
 const MemberPage = () => {
@@ -54,6 +57,7 @@ const MemberPage = () => {
     addMemberModalVisible: false,
     addMemberModalLoading: false,
     viewMode: false,
+    deleteModelVisible: false,
   };
 
   const [memberPageState, setMemberPageState] =
@@ -86,6 +90,7 @@ const MemberPage = () => {
     editMemberModalVisible,
     editMemberModalLoading,
     viewMode,
+    deleteModelVisible,
   } = memberPageState;
 
   const dataSource = useMemo(() => {
@@ -110,6 +115,7 @@ const MemberPage = () => {
           editMemberModalLoading: false,
           editMemberModalVisible: false,
           viewMode: false,
+          deleteModelVisible: false,
         });
         setPagination({
           ...pagination,
@@ -197,6 +203,12 @@ const MemberPage = () => {
       addMember(value)
         .then(res => {
           formAdd.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thêm thành viên thành công',
+            `Thành viên có mã ${value.staffID} đã được thêm mới`,
+            'bottomLeft',
+          );
           getMemberList({ pagination });
         })
         .catch(e => {
@@ -253,6 +265,12 @@ const MemberPage = () => {
       };
 
       updateMember(value).then(res => {
+        openNotificationWithIcon(
+          'success',
+          'Chỉnh sửa thành viên bệnh thành công',
+          `Thành viên có mã ${currentRowData.staffID} đã được cập nhật`,
+          'bottomLeft',
+        );
         getMemberList({ pagination });
       });
       formEdit.resetFields();
@@ -268,9 +286,16 @@ const MemberPage = () => {
     getMemberList({ pagination, key: value });
   };
 
-  const handleDeleteMember = async (memberNo: number) => {
-    await deleteMember(memberNo);
-    getMemberList({ pagination });
+  const handleDeleteMember = async (memberNo: number, staffID: string) => {
+    await deleteMember(memberNo).then(() => {
+      openNotificationWithIcon(
+        'error',
+        'Xóa nhân viên thành công',
+        `Nhân viên có mã ${staffID} đã được xóa`,
+        'bottomLeft',
+      );
+      getMemberList({ pagination });
+    });
   };
 
   const title = (
@@ -372,7 +397,11 @@ const MemberPage = () => {
                   style={{ fontSize: '150%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    handleDeleteMember(row.memberNo);
+                    setMemberPageState({
+                      ...memberPageState,
+                      currentRowData: row,
+                      deleteModelVisible: true,
+                    });
                   }}
                 />
               </span>
@@ -403,6 +432,21 @@ const MemberPage = () => {
         confirmLoading={addMemberModalLoading}
         onCancel={handleCancel}
         onOk={handleAddMemberOK}
+      />
+      <ConfirmDialog
+        visible={deleteModelVisible}
+        title="Xóa thành viên"
+        content={`Bạn có đồng ý xóa thành viên ${currentRowData.memberName} hay không?`}
+        onOK={() =>
+          handleDeleteMember(currentRowData.memberNo, currentRowData.staffID)
+        }
+        onCancel={() =>
+          setMemberPageState({
+            ...memberPageState,
+            currentRowData: {} as IMember,
+            deleteModelVisible: false,
+          })
+        }
       />
     </div>
   );
