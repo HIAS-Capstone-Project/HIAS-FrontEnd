@@ -1,4 +1,4 @@
-import { Form, Input, Modal } from 'antd';
+import { Checkbox, Form, Input, Modal } from 'antd';
 import { useEffect } from 'react';
 import { UpdateFormProps } from '../types';
 
@@ -11,7 +11,15 @@ const EditClientForm = (props: UpdateFormProps) => {
     confirmLoading,
     currentRowData,
     viewMode,
+    businessSectors,
   } = props;
+
+  const options = businessSectors.map(businessSector => {
+    return {
+      label: businessSector.businessSectorName,
+      value: businessSector.businessSectorNo,
+    };
+  });
 
   useEffect(() => {
     form.setFieldsValue(currentRowData);
@@ -61,6 +69,20 @@ const EditClientForm = (props: UpdateFormProps) => {
             placeholder="Nhập vào tên doanh nghiệp"
           />
         </Form.Item>
+
+        <Form.Item
+          name="businessSectorNos"
+          label="Chọn các ngành nghề liên quan:"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy chọn ít nhất một loại ngành nghề của doanh nghiệp!',
+            },
+          ]}
+        >
+          <Checkbox.Group options={options} />
+        </Form.Item>
+
         <Form.Item
           name="email"
           label="Email:"

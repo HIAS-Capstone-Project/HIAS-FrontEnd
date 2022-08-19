@@ -257,6 +257,7 @@ const MemberPage = () => {
       });
       const value = {
         ...fieldValue,
+        memberNo: currentRowData.memberNo,
         staffID: fieldValue.staffID.trim(),
         dob: fieldValue.dateOfBirth.format(DateFormat.DDMMYYYY),
         startDate: fieldValue.timeRange[0].format(DateFormat.DDMMYYYY),

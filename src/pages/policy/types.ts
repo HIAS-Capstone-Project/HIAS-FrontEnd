@@ -8,6 +8,7 @@ export interface IPolicy {
   policyName: string;
   policyNo: number;
   remark: string;
+  benefitNos: number[];
 }
 
 export interface FormProps {

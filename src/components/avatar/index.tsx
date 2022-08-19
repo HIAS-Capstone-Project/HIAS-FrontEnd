@@ -1,20 +1,17 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, Menu } from 'antd';
-import { useAppDispatch, useAppSelector } from 'app/hooks';
-import {
-  logOut,
-  selectCurrentUser,
-} from 'features/authentication/authenticationSlice';
-import styles from './avatar.module.css';
+import { useAppDispatch } from 'app/hooks';
 import Routes from 'constants/routes';
+import { logOut } from 'features/authentication/authenticationSlice';
 import { useNavigate } from 'react-router-dom';
+import styles from './avatar.module.css';
 
 interface IMenuAvatar {
   key: string;
 }
 
 const HeaderAvatar = () => {
-  const user = useAppSelector(selectCurrentUser);
+  // const info = useAppSelector(selectUserInfo);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 

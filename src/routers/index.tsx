@@ -16,7 +16,8 @@ const BenefitPage = React.lazy(() => import('../pages/benefit'));
 const EmployeePage = React.lazy(() => import('../pages/employee'));
 const BenefitItemPage = React.lazy(() => import('../pages/benefit-item'));
 const MemberPage = React.lazy(() => import('../pages/member'));
-// const CreateClaimPage = React.lazy(() => import('../pages/claim'));
+const CreateClaimPage = React.lazy(() => import('../pages/claim'));
+const ManageClaim = React.lazy(() => import('../pages/claim/ManageClaim'));
 // const MainLayout = React.lazy(() => import('../layouts/main-layout'));
 
 const routes: HIASRoute[] = [
@@ -58,10 +59,14 @@ const routes: HIASRoute[] = [
     path: '/member',
     element: <MemberPage />,
   },
-  // {
-  //   path: '/claim',
-  //   element: <CreateClaimPage />,
-  // },
+  {
+    path: '/create-claim',
+    element: <CreateClaimPage />,
+  },
+  {
+    path: '/claim',
+    element: <ManageClaim />,
+  },
 ];
 
 export default routes;

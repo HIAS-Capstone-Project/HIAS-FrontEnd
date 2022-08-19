@@ -1,5 +1,5 @@
 import { FormInstance, TablePaginationConfig } from 'antd';
-import { ILicense } from './../../models/license/types';
+import { ILicense } from 'models/license/types';
 
 export interface IBenefit {
   benefitCode: string;

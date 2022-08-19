@@ -12,7 +12,8 @@ import {
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
 import _ from 'lodash';
-import { MouseEvent, useEffect, useState } from 'react';
+import { IBenefitDTOS } from 'models/benefit/types';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
 import {
   addBenefit,
   deleteBenefit,
@@ -24,14 +25,14 @@ import { NOT_ACCEPTABLE } from './../../constants';
 import { ILicense } from './../../models/license/types';
 import AddBenefitForm from './form/add-benefit-form';
 import EditBenefitForm from './form/edit-benefit-form';
-import { IBenefit, QueryParams } from './types';
+import { QueryParams } from './types';
 const { Column } = Table;
 
 interface BenefitPageState {
-  benefitList: IBenefit[];
+  benefitList: IBenefitDTOS[];
   editBenefitModalVisible: boolean;
   editBenefitModalLoading: boolean;
-  currentRowData: IBenefit;
+  currentRowData: IBenefitDTOS;
   addBenefitModalVisible: boolean;
   addBenefitModalLoading: boolean;
   viewMode: boolean;
@@ -43,10 +44,10 @@ const BenefitPage = () => {
   const [formEdit] = Form.useForm();
 
   const initialState = {
-    benefitList: [] as IBenefit[],
+    benefitList: [] as IBenefitDTOS[],
     editBenefitModalVisible: false,
     editBenefitModalLoading: false,
-    currentRowData: {} as IBenefit,
+    currentRowData: {} as IBenefitDTOS,
     addBenefitModalVisible: false,
     addBenefitModalLoading: false,
     viewMode: false,
@@ -83,12 +84,23 @@ const BenefitPage = () => {
     deleteModelVisible,
   } = benefitPageState;
 
+  const dataSource = useMemo(() => {
+    return benefitList.map(benefit => {
+      return {
+        ...benefit,
+        licenseNos: benefit.licenseResponseDTOS.map(
+          license => license.licenseNo,
+        ),
+      };
+    });
+  }, [benefitList]);
+
   const getBenefitList = async (params: QueryParams = {}) => {
     getBenefits(params).then(res => {
       if (res) {
         setBenefitPageState({
           benefitList: res.rows,
-          currentRowData: {} as IBenefit,
+          currentRowData: {} as IBenefitDTOS,
           addBenefitModalVisible: false,
           addBenefitModalLoading: false,
           editBenefitModalLoading: false,
@@ -167,7 +179,7 @@ const BenefitPage = () => {
     });
   };
 
-  const handleEditBenefit = (row: IBenefit) => {
+  const handleEditBenefit = (row: IBenefitDTOS) => {
     setBenefitPageState({
       ...benefitPageState,
       editBenefitModalVisible: true,
@@ -260,7 +272,7 @@ const BenefitPage = () => {
       ...benefitPageState,
       addBenefitModalVisible: false,
       editBenefitModalVisible: false,
-      currentRowData: {} as IBenefit,
+      currentRowData: {} as IBenefitDTOS,
       viewMode: false,
     });
   };
@@ -284,7 +296,7 @@ const BenefitPage = () => {
           }}
           bordered
           rowKey="benefitNo"
-          dataSource={benefitList}
+          dataSource={dataSource}
           pagination={pagination}
           onChange={handleTableChange}
         >
@@ -304,7 +316,7 @@ const BenefitPage = () => {
             title="Thao tác"
             key="action"
             align="center"
-            render={(text, row: IBenefit) => (
+            render={(text, row: IBenefitDTOS) => (
               <span>
                 <EditTwoTone
                   style={{ fontSize: '150%' }}
@@ -361,7 +373,7 @@ const BenefitPage = () => {
         onCancel={() =>
           setBenefitPageState({
             ...benefitPageState,
-            currentRowData: {} as IBenefit,
+            currentRowData: {} as IBenefitDTOS,
             deleteModelVisible: false,
           })
         }

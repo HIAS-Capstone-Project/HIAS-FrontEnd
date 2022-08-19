@@ -18,6 +18,13 @@ const LayoutSider = () => {
       //   background: 'linear-gradient(45deg, #8b5aed 0%, #78ebfc 100%)',
       //   borderRadius: '0 15px 15px 0',
       // }}
+      style={{
+        overflow: 'auto',
+        height: '100vh',
+        position: 'sticky',
+        top: 0,
+        left: 0,
+      }}
       theme="light"
       collapsible
       collapsed={layout.sidebarCollapsed}

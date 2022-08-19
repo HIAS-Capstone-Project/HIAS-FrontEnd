@@ -1,8 +1,9 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import Routes from 'constants/routes';
 import {
+  getInfoUser,
   login,
   selectCurrentUser,
 } from 'features/authentication/authenticationSlice';
@@ -26,6 +27,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticate) {
+      dispatch(getInfoUser({ role: user.role, primaryKey: user.primary_key }));
       navigate(Routes.HOME);
     }
   }, [isAuthenticate, navigate]);

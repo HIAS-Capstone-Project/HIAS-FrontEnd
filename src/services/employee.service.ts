@@ -1,6 +1,7 @@
 import httpProvider from 'http/http-provider';
 import { IEmployeeResponse } from 'models/employee/types';
 import { IEmployee, IEmploymentType, QueryParams } from 'pages/employee/types';
+import { IMember } from 'pages/member/types';
 import queryString from 'query-string';
 
 export const getEmployees = async (params: QueryParams) => {
@@ -12,6 +13,13 @@ export const getEmployees = async (params: QueryParams) => {
   };
   const response = await httpProvider.get<IEmployeeResponse>(
     `employee/search?${queryString.stringify({ ...query })}`,
+  );
+  return response.data;
+};
+
+export const getBenefitsByMember = async (memberNo: number) => {
+  const response = await httpProvider.get<IMember[]>(
+    `employee/find-detail?employeeNo=${memberNo}`,
   );
   return response.data;
 };

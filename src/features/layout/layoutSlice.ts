@@ -3,10 +3,12 @@ import { RootState } from 'app/store';
 
 export interface ILayoutSlice {
   sidebarCollapsed: boolean;
+  isloading: boolean;
 }
 
 const initialState: ILayoutSlice = {
   sidebarCollapsed: true,
+  isloading: false,
 };
 
 const layoutSilce = createSlice({
@@ -16,10 +18,13 @@ const layoutSilce = createSlice({
     toggleSiderBar: state => {
       state.sidebarCollapsed = !state.sidebarCollapsed;
     },
+    showLoading: (state, action) => {
+      state.isloading = action.payload;
+    },
   },
 });
 
-export const { toggleSiderBar } = layoutSilce.actions;
+export const { toggleSiderBar, showLoading } = layoutSilce.actions;
 
 export const selectLayout = (state: RootState) => state.layout;
 

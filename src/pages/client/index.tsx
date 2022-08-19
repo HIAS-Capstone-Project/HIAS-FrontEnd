@@ -11,7 +11,9 @@ import {
 } from 'antd';
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
+import _ from 'lodash';
 import { MouseEvent, useEffect, useState } from 'react';
+import { getBusinessSectors } from 'services/business.sector';
 import {
   addClient,
   deleteClient,
@@ -21,7 +23,7 @@ import {
 import { NOT_ACCEPTABLE } from './../../constants';
 import AddClientForm from './forms/add-client-form';
 import EditClientForm from './forms/edit-client-form';
-import { IClient, QueryParams } from './types';
+import { IBusinessSector, IClient, QueryParams } from './types';
 const { Column } = Table;
 
 interface ClientPageState {
@@ -67,6 +69,7 @@ const ClientPage = () => {
   });
 
   const [key, setKey] = useState<string>('');
+  const [businessSectors, setBusinessSectors] = useState<IBusinessSector[]>([]);
 
   const {
     clientList,
@@ -106,8 +109,19 @@ const ClientPage = () => {
       }
     });
   };
+
+  const getBusinessSectorList = async () => {
+    getBusinessSectors().then(res => {
+      if (res) {
+        if (_.isEmpty(res)) return;
+        setBusinessSectors(res);
+      }
+    });
+  };
+
   useEffect(() => {
     getClientList({ pagination });
+    getBusinessSectorList();
   }, []);
 
   const handleAddClient = () => {
@@ -331,6 +345,7 @@ const ClientPage = () => {
         confirmLoading={editClientModalLoading}
         onCancel={handleCancel}
         onOk={handleEditClientOK}
+        businessSectors={businessSectors}
       />
       <AddClientForm
         form={formAdd}
@@ -338,6 +353,7 @@ const ClientPage = () => {
         confirmLoading={addClientModalLoading}
         onCancel={handleCancel}
         onOk={handleAddClientOK}
+        businessSectors={businessSectors}
       />
       <ConfirmDialog
         visible={deleteModelVisible}

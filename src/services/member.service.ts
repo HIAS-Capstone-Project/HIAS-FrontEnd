@@ -3,6 +3,11 @@ import { IMemberResponse } from 'models/member/types';
 import { IMember, QueryParams } from 'pages/member/types';
 import queryString from 'query-string';
 
+export const getAllMember = async () => {
+  const response = await httpProvider.get<IMember[]>('member/find-all');
+  return response.data;
+};
+
 export const getMembers = async (params: QueryParams) => {
   const { pagination, key } = params;
   const query = {
@@ -12,6 +17,13 @@ export const getMembers = async (params: QueryParams) => {
   };
   const response = await httpProvider.get<IMemberResponse>(
     `member/search?${queryString.stringify({ ...query })}`,
+  );
+  return response.data;
+};
+
+export const findMemberByMemberNo = async (param: number) => {
+  const response = await httpProvider.get<IMember>(
+    `member/find-detail?memberNo=${param}`,
   );
   return response.data;
 };

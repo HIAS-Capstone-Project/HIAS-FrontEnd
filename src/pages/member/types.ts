@@ -35,6 +35,7 @@ export interface IMember {
   policyNo: number;
   staffID: string;
   startDate: string;
+  healthCardNo: string;
 }
 
 export interface FormProps {

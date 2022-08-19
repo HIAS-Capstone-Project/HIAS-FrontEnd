@@ -1,10 +1,17 @@
 import httpProvider from 'http/http-provider';
-import { IBenefitResponse } from 'models/benefit/types';
+import { IBenefitDTOS, IBenefitResponse } from 'models/benefit/types';
 import { IBenefit, QueryParams } from 'pages/benefit/types';
 import queryString from 'query-string';
 
 export const getAllBenefit = async () => {
   const response = await httpProvider.get<IBenefit[]>('benefit/find-all');
+  return response.data;
+};
+
+export const getBenefitsByMember = async (memberNo: number) => {
+  const response = await httpProvider.get<IBenefitDTOS[]>(
+    `benefit/find-by-member-no/${memberNo}`,
+  );
   return response.data;
 };
 
