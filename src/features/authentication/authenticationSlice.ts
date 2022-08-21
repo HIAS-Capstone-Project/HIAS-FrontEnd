@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from 'app/store';
 import ROLE from 'constants/roles';
 import { toggleSiderBar } from 'features/layout/layoutSlice';
+import _ from 'lodash';
 import { ILoginParams, IUserInfoParams } from 'pages/login/types';
 import { AuthService } from 'services';
 import { findMemberByMemberNo } from 'services/member.service';
@@ -59,9 +60,13 @@ const authSilce = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        LocalStorageUtil.setSessionInfo({
-          token: action.payload?.access_token,
-        });
+        if (!_.isEmpty(action.payload)) {
+          LocalStorageUtil.setSessionInfo({
+            token: action.payload?.access_token,
+            role: action.payload?.role,
+            primaryKey: action.payload?.primary_key.toString(),
+          });
+        }
         state.user = { ...action.payload, isLogined: true };
       })
       .addCase(login.rejected, state => {

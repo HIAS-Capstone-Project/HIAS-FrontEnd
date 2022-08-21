@@ -1,6 +1,8 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
+// import logo from 'assets/logo.png';
+import logo from 'assets/logo.svg';
 import Routes from 'constants/routes';
 import {
   getInfoUser,
@@ -35,6 +37,13 @@ const LoginPage = () => {
   return (
     <div className={styles.wapperLogin}>
       <div className={styles.loginContainer}>
+        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <img
+            src={logo}
+            alt="logo"
+            style={{ height: '192px', width: 'auto' }}
+          />
+        </div>
         <Form onFinish={handleLogin} className="login-form">
           <Form.Item
             name="username"
@@ -57,20 +66,6 @@ const LoginPage = () => {
               placeholder="Mật khẩu"
             />
           </Form.Item>
-          {/* <Form.Item style={{ marginBottom: '16px' }}>
-            <Form.Item
-              name="isRemember"
-              valuePropName="checked"
-              initialValue={true}
-              noStyle
-            >
-              <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-            <a className={styles.forgotPassword} href="">
-              Forgot your password?
-            </a>
-          </Form.Item> */}
-
           <Form.Item>
             <Button
               size="large"
@@ -80,6 +75,9 @@ const LoginPage = () => {
             >
               Đăng nhập
             </Button>
+          </Form.Item>
+          <Form.Item className={styles.forgotPassword}>
+            Quên mật khẩu?
           </Form.Item>
         </Form>
       </div>

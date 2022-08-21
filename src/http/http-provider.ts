@@ -32,7 +32,9 @@ class HttpProvider {
     const session = LocalStorageUtil.getSessionInfo();
     if (session.token) {
       this.token = session.token;
-      this.axiosInstance.defaults.headers.common.Authorization = session.token;
+      this.axiosInstance.defaults.headers.common.Authorization = `Bearer ${session.token}`;
+      this.axiosInstance.defaults.headers.common.primaryKey =
+        session.primaryKey?.toString() || '';
     }
   };
 

@@ -67,6 +67,10 @@ const routes: HIASRoute[] = [
     path: '/claim',
     element: <ManageClaim />,
   },
+  {
+    path: '/create-claim/:claimNo',
+    element: <CreateClaimPage />,
+  },
 ];
 
 export default routes;

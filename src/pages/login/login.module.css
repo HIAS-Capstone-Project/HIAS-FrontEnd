@@ -23,7 +23,9 @@
 }
 
 .forgotPassword {
-  float: right;
+  margin-bottom: 16px;
+  text-align: center;
+  color: #1890ff;
 }
 
 .loginButton{ 

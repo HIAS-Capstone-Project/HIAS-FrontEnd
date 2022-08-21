@@ -1,4 +1,4 @@
-import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
+import { DeleteOutlined, EditTwoTone } from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -337,15 +337,15 @@ const BenefitItemPage = () => {
             render={(text, row: IBenefitItem) => (
               <span>
                 <EditTwoTone
-                  style={{ fontSize: '150%' }}
+                  style={{ fontSize: '200%' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     handleEditBenefitItem(row);
                   }}
                 />
-                <Divider type="vertical" />
-                <DeleteTwoTone
-                  style={{ fontSize: '150%' }}
+                <Divider type="vertical" style={{ fontSize: '200%' }} />
+                <DeleteOutlined
+                  style={{ fontSize: '200%', color: '#ff4d4f' }}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     setBenefitItemPageState({

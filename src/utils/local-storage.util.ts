@@ -1,6 +1,7 @@
 export interface ISession {
   token?: string;
-  roles?: string;
+  role?: string;
+  primaryKey?: string;
 }
 
 function convertStringToObject(

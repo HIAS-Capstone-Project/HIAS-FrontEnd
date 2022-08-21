@@ -21,6 +21,11 @@ export const submitClaimByMember = async (param: FormData) => {
   return response.data;
 };
 
+export const saveDraftClaimByMember = async (param: FormData) => {
+  const response = await httpProvider.post<any>('claim/save-draft', param);
+  return response.data;
+};
+
 export const getDetailClaim = async (param: number) => {
   const response = await httpProvider.get<IClaim>(`claim/view-detail/${param}`);
   return response.data;

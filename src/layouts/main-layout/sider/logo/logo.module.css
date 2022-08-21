@@ -9,7 +9,7 @@
 }
 .sidebarLogo {
   width: 60px;
-  animation: sidebar-logo-spin infinite 10s linear;
+  /* animation: sidebar-logo-spin infinite 10s linear; */
 }
 
 .sidebarTitle {
@@ -23,11 +23,11 @@
   vertical-align: middle;
 }
 
-@keyframes sidebar-logo-spin {
+/* @keyframes sidebar-logo-spin {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
   }
-}
+} */
