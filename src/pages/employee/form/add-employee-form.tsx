@@ -4,6 +4,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import { IEmploymentType } from 'pages/employee/types';
 import { useState } from 'react';
+import { isVietnamesePhoneNumber } from 'utils';
 import { FormProps } from '../types';
 
 const AddEmployeeForm = (props: FormProps) => {
@@ -185,7 +186,17 @@ const AddEmployeeForm = (props: FormProps) => {
           rules={[
             {
               required: true,
-              message: 'Hãy nhập vào số điện thoại của nhân viên!',
+              message: 'Hãy nhập vào số điện thoại của doanh nghiệp',
+            },
+            {
+              validator: (dump, value: number) => {
+                if (!value) return Promise.resolve();
+                if (isVietnamesePhoneNumber(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject();
+              },
+              message: 'Số điện thoại không đúng',
             },
           ]}
         >

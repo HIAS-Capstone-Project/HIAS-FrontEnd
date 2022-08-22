@@ -5,6 +5,7 @@ import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { UpdateFormProps, IDistrict } from '../types';
 import { IPolicy } from 'pages/policy/types';
+import { isVietnamesePhoneNumber } from 'utils';
 
 const EditMemberForm = (props: UpdateFormProps) => {
   const {
@@ -412,7 +413,17 @@ const EditMemberForm = (props: UpdateFormProps) => {
           rules={[
             {
               required: true,
-              message: 'Hãy nhập vào số điện thoại của nhân viên',
+              message: 'Hãy nhập vào số điện thoại của doanh nghiệp',
+            },
+            {
+              validator: (dump, value: number) => {
+                if (!value) return Promise.resolve();
+                if (isVietnamesePhoneNumber(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject();
+              },
+              message: 'Số điện thoại không đúng',
             },
           ]}
         >

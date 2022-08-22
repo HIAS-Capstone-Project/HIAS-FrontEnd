@@ -1,5 +1,6 @@
 import { Checkbox, Form, Input, Modal } from 'antd';
 import { useEffect } from 'react';
+import { isVietnamesePhoneNumber } from 'utils';
 import { UpdateFormProps } from '../types';
 
 const EditClientForm = (props: UpdateFormProps) => {
@@ -125,7 +126,17 @@ const EditClientForm = (props: UpdateFormProps) => {
           rules={[
             {
               required: true,
-              message: 'Hãy nhập vào số điện thoại của doanh nghiệp!',
+              message: 'Hãy nhập vào số điện thoại của doanh nghiệp',
+            },
+            {
+              validator: (dump, value: number) => {
+                if (!value) return Promise.resolve();
+                if (isVietnamesePhoneNumber(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject();
+              },
+              message: 'Số điện thoại không đúng',
             },
           ]}
         >
