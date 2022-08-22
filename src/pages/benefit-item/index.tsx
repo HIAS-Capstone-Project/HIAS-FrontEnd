@@ -322,7 +322,7 @@ const BenefitItemPage = () => {
             align="center"
           />
           <Column
-            title="Chi phí được chi trả"
+            title="Chi phí được bảo trợ"
             dataIndex="budgetAmount"
             key="budgetAmount"
             align="center"

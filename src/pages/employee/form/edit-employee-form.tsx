@@ -44,7 +44,7 @@ const EditEmployeeForm = (props: UpdateFormProps) => {
 
   return (
     <Modal
-      title="Chỉnh sửa nhân viên"
+      title={viewMode ? 'Thông tin nhân viên' : 'Chỉnh sửa nhân viên'}
       visible={visible}
       onCancel={() => {
         onCancel();

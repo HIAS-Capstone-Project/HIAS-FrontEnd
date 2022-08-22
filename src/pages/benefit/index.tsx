@@ -252,7 +252,7 @@ const BenefitPage = () => {
     >
       <span>
         <Button size="large" type="primary" onClick={handleAddBenefit}>
-          Thêm Quyền Lợi
+          Thêm Quyền lợi
         </Button>
       </span>
       <Input.Search

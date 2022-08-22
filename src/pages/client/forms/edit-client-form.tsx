@@ -28,7 +28,7 @@ const EditClientForm = (props: UpdateFormProps) => {
 
   return (
     <Modal
-      title="Chỉnh sửa doanh nghiệp"
+      title={viewMode ? 'Thông tin doanh nghiệp' : 'Chỉnh sửa doanh nghiệp'}
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

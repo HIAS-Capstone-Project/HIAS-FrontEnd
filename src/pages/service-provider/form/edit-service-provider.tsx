@@ -42,7 +42,11 @@ const EditServiceProviderForm = (props: UpdateFormProps) => {
 
   return (
     <Modal
-      title="Chỉnh sửa Cơ Sở Khám Chữa Bệnh"
+      title={
+        viewMode
+          ? 'Thông tin cơ sở khám chữa bệnh'
+          : 'Chỉnh sửa cơ sở khám chữa bệnh'
+      }
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

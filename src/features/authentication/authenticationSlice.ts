@@ -64,7 +64,7 @@ const authSilce = createSlice({
           LocalStorageUtil.setSessionInfo({
             token: action.payload?.access_token,
             role: action.payload?.role,
-            primaryKey: action.payload?.primary_key.toString(),
+            primaryKey: action.payload?.primary_key?.toString() || '',
           });
         }
         state.user = { ...action.payload, isLogined: true };

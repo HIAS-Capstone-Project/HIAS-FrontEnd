@@ -85,7 +85,7 @@ const EditMemberForm = (props: UpdateFormProps) => {
   return (
     <Modal
       width={800}
-      title="Chỉnh sửa thành viên"
+      title={viewMode ? 'Thông tin thành viên' : 'Chỉnh sửa thành viên'}
       visible={visible}
       onCancel={() => {
         onCancel();

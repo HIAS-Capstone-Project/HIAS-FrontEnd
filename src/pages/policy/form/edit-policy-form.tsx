@@ -30,7 +30,7 @@ const EditPolicyForm = (props: UpdateFormProps) => {
 
   return (
     <Modal
-      title="Chỉnh sửa chính sách"
+      title={viewMode ? 'Thông tin chính sách' : 'Chỉnh sửa chính sách'}
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

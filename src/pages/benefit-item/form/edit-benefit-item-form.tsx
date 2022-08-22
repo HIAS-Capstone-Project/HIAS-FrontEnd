@@ -22,7 +22,11 @@ const EditBenefitItemForm = (props: UpdateFormProps) => {
   return (
     <Modal
       getContainer={false}
-      title="Chỉnh sửa danh mục quyền lợi"
+      title={
+        viewMode
+          ? 'Thông tin danh mục quyền lợi'
+          : 'Chỉnh sửa danh mục quyền lợi'
+      }
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

@@ -28,7 +28,7 @@ const EditBenefitForm = (props: UpdateFormProps) => {
 
   return (
     <Modal
-      title="Chỉnh sửa quyền lợi"
+      title={viewMode ? 'Thông tin quyền lợi' : 'Chỉnh sửa quyền lợi'}
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

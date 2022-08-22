@@ -248,7 +248,7 @@ const ServiceProviderPage = () => {
     >
       <span>
         <Button size="large" type="primary" onClick={handleAddServiceProvider}>
-          Thêm Cơ Sở Khám Chữa Bệnh
+          Thêm Cơ sở khám chữa bệnh
         </Button>
       </span>
       <Input.Search

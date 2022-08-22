@@ -234,7 +234,7 @@ const ClientPage = () => {
     >
       <span>
         <Button size="large" type="primary" onClick={handleAddClient}>
-          Thêm Doanh Nghiệp
+          Thêm Doanh nghiệp
         </Button>
       </span>
       <Input.Search
