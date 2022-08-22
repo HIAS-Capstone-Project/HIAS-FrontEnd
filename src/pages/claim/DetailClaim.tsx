@@ -81,9 +81,16 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
             </Col>
             <Col span={8}>
               <Card type="inner" title="Thời gian tham gia bảo hiểm">
-                Từ<strong>{` ${claim?.memberResponseDTO?.startDate} `}</strong>
+                Từ
+                <strong>{` ${moment(
+                  claim?.memberResponseDTO?.startDate,
+                  DateFormat.YYYYMMDD,
+                ).format(DateFormat.DDMMYYYY)} `}</strong>
                 đến
-                <strong>{` ${claim?.memberResponseDTO?.endDate}`}</strong>
+                <strong>{` ${moment(
+                  claim?.memberResponseDTO?.endDate,
+                  DateFormat.YYYYMMDD,
+                ).format(DateFormat.DDMMYYYY)}`}</strong>
               </Card>
             </Col>
           </Row>

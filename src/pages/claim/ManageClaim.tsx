@@ -1,4 +1,6 @@
 import {
+  CloseCircleOutlined,
+  EditTwoTone,
   ExportOutlined,
   FileDoneOutlined,
   FileExcelOutlined,
@@ -42,6 +44,8 @@ import {
 import DetailClaim from './DetailClaim';
 import RejectForm from './form/reject-form';
 import SettleForm from './form/settle-form';
+import { useNavigate } from 'react-router-dom';
+import { cancelClaim } from './../../services/claim.service';
 
 const { Column } = Table;
 
@@ -67,6 +71,7 @@ const ManageClaim = () => {
   const dispatch = useAppDispatch();
   const layout = useAppSelector(selectLayout);
   const user = useAppSelector(selectCurrentUser) as IUser;
+  const navigate = useNavigate();
   const initialState = {
     claimList: [] as IClaim[],
     currentRowData: {} as IClaim,
@@ -308,6 +313,39 @@ const ManageClaim = () => {
       });
   };
 
+  const cancelClaimAction = async (claim: IClaim) => {
+    dispatch(showLoading(true));
+    cancelClaim(claim.claimNo)
+      .then(res => {
+        if (res) {
+          if (_.isEmpty(res)) return;
+          openNotificationWithIcon(
+            'success',
+            'Hủy yêu cầu bồi thường thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} đã bị hủy`,
+            'bottomLeft',
+          );
+          getClaimList({ pagination });
+        }
+      })
+      .catch(() => {
+        openNotificationWithIcon(
+          'error',
+          'Hủy yêu cầu bồi thường thất bại',
+          `Xảy ra lỗi trong quá trình hủy của yêu cầu bồi thường có mã ${claim.claimID} `,
+          'bottomLeft',
+        );
+      })
+      .finally(() => {
+        dispatch(showLoading(false));
+        setClaimPageState({
+          ...claimPageState,
+          confirmVisible: false,
+          dialogContent: {} as IDialog,
+        });
+      });
+  };
+
   const business = async (claim: IClaim) => {
     dispatch(showLoading(true));
     businessVerified(claim.claimNo)
@@ -428,6 +466,24 @@ const ManageClaim = () => {
         content: `Bạn có đồng ý bắt đầu quá trình phê duyệt yêu cầu bồi thường có mã ${claim.claimID}`,
         onOK: () => {
           startProgress(claim);
+        },
+        onCancel: () => {
+          handleCancel();
+        },
+      },
+    });
+  };
+
+  const handleCancelClaim = (claim: IClaim) => {
+    setClaimPageState({
+      ...claimPageState,
+      confirmVisible: true,
+      currentRowData: { ...claim },
+      dialogContent: {
+        title: 'Hủy yêu cầu bồi thường',
+        content: `Bạn có đồng ý hủy yêu cầu bồi thường có mã ${claim.claimID} không?`,
+        onOK: () => {
+          cancelClaimAction(claim);
         },
         onCancel: () => {
           handleCancel();
@@ -617,6 +673,28 @@ const ManageClaim = () => {
           />
         );
       }
+    }
+
+    if (claim.statusCode === STATUS.DRAFT.key) {
+      return (
+        <>
+          <EditTwoTone
+            style={{ fontSize: '200%' }}
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              navigate(`/create-claim/${claim.claimNo}`);
+            }}
+          />
+          <Divider type="vertical" style={{ fontSize: '200%' }} />
+          <CloseCircleOutlined
+            style={{ fontSize: '200%', color: '#ff4d4f' }}
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              handleCancelClaim(claim);
+            }}
+          />
+        </>
+      );
     }
     return <></>;
   };

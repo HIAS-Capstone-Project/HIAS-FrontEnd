@@ -6,6 +6,7 @@ import {
   ControlOutlined,
   FolderOutlined,
   GroupOutlined,
+  HomeOutlined,
   LineOutlined,
   MessageOutlined,
   PartitionOutlined,
@@ -33,6 +34,7 @@ const menu: any = {
   'Manage Benefit Item': <PartitionOutlined style={{ fontSize: '150%' }} />,
   team: <TeamOutlined />,
   message: <MessageOutlined />,
+  'Trang chủ': <HomeOutlined style={{ fontSize: '150%' }} />,
 };
 
 export default menu;
