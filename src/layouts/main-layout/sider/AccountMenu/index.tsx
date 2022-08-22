@@ -40,6 +40,12 @@ const AccountMenu = ({ currentUser }: any) => {
 
   return (
     <Menu
+      // style={{
+      //   height: '100%',
+      //   display: 'flex',
+      //   justifyContent: 'center',
+      //   flexDirection: 'column',
+      // }}
       defaultSelectedKeys={['0']}
       defaultOpenKeys={['sub1']}
       mode="inline"

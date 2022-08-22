@@ -179,7 +179,7 @@ const CreateClaimPage = () => {
       medicalAddress: claim.medicalAddress || undefined,
       description: claim.description || undefined,
       claimAmount: claim.claimAmount,
-      visitDate: moment(claim.visitDate, DateFormat.DDMMYYYY),
+      visitDate: moment(claim.visitDate, DateFormat.YYYYMMDDT),
     } as any;
 
     if (
@@ -187,8 +187,8 @@ const CreateClaimPage = () => {
       !_.isEmpty(claim.admissionToDate)
     ) {
       res.timeRange = [
-        moment(claim.admissionFromDate, DateFormat.DDMMYYYY),
-        moment(claim.admissionToDate, DateFormat.DDMMYYYY),
+        moment(claim.admissionFromDate, DateFormat.YYYYMMDDT),
+        moment(claim.admissionToDate, DateFormat.YYYYMMDDT),
       ];
     }
 
@@ -312,7 +312,7 @@ const CreateClaimPage = () => {
     const formData = new FormData();
     delete value.timeRange;
     licenseList.forEach((license, index) => {
-      if (!_.isEmpty(filesList[index][0].url)) {
+      if (_.isEmpty(filesList[index][0].url)) {
         formData.append('documents', fieldValue[license.licenseNo.toString()]);
         delete value[license.licenseNo.toString()];
       }
