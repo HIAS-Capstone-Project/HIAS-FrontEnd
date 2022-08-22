@@ -46,7 +46,13 @@ const Detail = (props: IDetailProps) => {
                         !_.isEmpty(value.fileList)
                       ) {
                         return Promise.resolve();
-                      } else if (typeof value.name === 'string') {
+                      } else if (
+                        value &&
+                        value.name &&
+                        typeof value.name === 'string'
+                      ) {
+                        return Promise.resolve();
+                      } else if (_.isEmpty(value) && !_.isEmpty(fileList)) {
                         return Promise.resolve();
                       }
                       return Promise.reject();

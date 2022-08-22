@@ -9,17 +9,20 @@ import {
   Typography,
 } from 'antd';
 import DateFormat from 'constants/date-format';
+import _ from 'lodash';
 import { IBenefitDTOS } from 'models/benefit/types';
 import moment from 'moment';
+import { IClaim } from 'pages/claim/types';
 
 const { Title } = Typography;
 
 interface IBenefitClaimProps {
   benefits: IBenefitDTOS[];
+  claim: IClaim;
 }
 
 const BenefitClaim = (props: IBenefitClaimProps) => {
-  const { benefits } = props;
+  const { benefits, claim } = props;
   return (
     <Space>
       <Card style={{ minHeight: '70vh' }} bordered={false}>
@@ -95,6 +98,19 @@ const BenefitClaim = (props: IBenefitClaimProps) => {
                 required: true,
                 message: 'Hãy chọn lại ngày khám bệnh!',
               },
+              {
+                message:
+                  'Ngày khám nằm ngoài khoảng thời gian được hưởng quyền lợi.',
+                validator: (rule, value) => {
+                  if (_.isEmpty(claim)) return Promise.resolve();
+                  if (
+                    value.isBefore(moment(claim.memberResponseDTO.startDate)) ||
+                    value.isAfter(moment(claim.memberResponseDTO.endDate))
+                  )
+                    return Promise.reject();
+                  return Promise.resolve();
+                },
+              },
             ]}
           >
             <DatePicker
@@ -108,6 +124,7 @@ const BenefitClaim = (props: IBenefitClaimProps) => {
 
           <Form.Item name="timeRange" label="Thời gian điều trị:">
             <DatePicker.RangePicker
+              allowEmpty={[true, true]}
               style={{ width: '100%' }}
               size="large"
               placeholder={['Từ ngày', 'Đến ngày']}

@@ -1,4 +1,4 @@
-import { TablePaginationConfig } from 'antd';
+import { FormInstance, TablePaginationConfig } from 'antd';
 import { IBenefitDTOS } from 'models/benefit/types';
 import { IClaimDocumentResponseDTO } from 'models/claim/types';
 import { IClient } from 'pages/client/types';
@@ -48,4 +48,25 @@ export interface IClaim {
 export interface QueryParams {
   pagination?: TablePaginationConfig;
   key?: string;
+}
+
+export interface IClaimRejectRequestDTO {
+  claimNo: number;
+  rejectReason: string;
+  statusReasonCode: string;
+}
+
+export interface IClaimPaymentRequestDTO {
+  claimNo: number;
+  paymentAmount: number;
+  remark: string;
+}
+
+export interface FormProps {
+  claim: IClaim;
+  visible: boolean;
+  onCancel: () => void;
+  onOk: () => void;
+  confirmLoading: boolean;
+  form: FormInstance;
 }

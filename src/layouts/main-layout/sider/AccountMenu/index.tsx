@@ -1,20 +1,10 @@
-import React from 'react';
-import { Button, Menu } from 'antd';
-import {
-  AppstoreOutlined,
-  ContainerOutlined,
-  DesktopOutlined,
-  MailOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  PieChartOutlined,
-} from '@ant-design/icons';
+import { Menu } from 'antd';
 import { useAppSelector } from 'app/hooks';
-import { selectLayout } from 'features/layout/layoutSlice';
 import { IUser } from 'features/authentication/types';
-import dashboardLinks from '../../../../pages/links';
+import { selectLayout } from 'features/layout/layoutSlice';
 import { useNavigate } from 'react-router';
 import iconMap from 'utils/iconMap';
+import dashboardLinks from '../../../../pages/links';
 
 interface IAccountMenu {
   user: IUser | null;

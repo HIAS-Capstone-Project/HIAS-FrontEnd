@@ -163,7 +163,7 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
             )}
             <Col span={8}>
               <Card type="inner" title="Chi phí đã chi trả">
-                {claim?.claimAmount
+                {(claim?.claimAmount || 0)
                   ?.toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}
                 VNĐ
@@ -198,12 +198,14 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
           </Row>
 
           <Row style={{ padding: '8px 0' }} gutter={16}>
-            <Col span={8}>
-              <Card type="inner" title="Nhân viên xác minh nghiệp vụ">
-                {claim?.businessAppraisal.employeeID} -{' '}
-                {claim?.businessAppraisal.employeeName}
-              </Card>
-            </Col>
+            {claim?.businessAppraisal && (
+              <Col span={8}>
+                <Card type="inner" title="Nhân viên xác minh nghiệp vụ">
+                  {claim?.businessAppraisal.employeeID} -{' '}
+                  {claim?.businessAppraisal.employeeName}
+                </Card>
+              </Col>
+            )}
             {claim?.medicalAppraisal && (
               <Col span={8}>
                 <Card type="inner" title="Nhân viên xác minh y tế">
