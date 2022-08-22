@@ -14,6 +14,7 @@ import { selectLayout } from 'features/layout/layoutSlice';
 import { IUser } from 'features/authentication/types';
 import dashboardLinks from '../../../../pages/links';
 import { useNavigate } from 'react-router';
+import iconMap from 'utils/iconMap';
 
 interface IAccountMenu {
   user: IUser | null;
@@ -36,11 +37,11 @@ function getItem(
 }
 
 const AccountMenu = ({ currentUser }: any) => {
-  // const layout = useAppSelector(selectLayout);
+  const layout = useAppSelector(selectLayout);
   const tabs = currentUser ? dashboardLinks[currentUser?.role] : [];
   const navigate = useNavigate();
   const items = tabs.map((link: any, item: string) => {
-    return getItem(link.name, item, <PieChartOutlined />);
+    return getItem(link.name, item, iconMap[link.name]);
   });
 
   const handleClick = (e: any) => {
@@ -52,7 +53,7 @@ const AccountMenu = ({ currentUser }: any) => {
       defaultSelectedKeys={['0']}
       defaultOpenKeys={['sub1']}
       mode="inline"
-      // inlineCollapsed={layout.sidebarCollapsed}
+      inlineCollapsed={layout.sidebarCollapsed}
       items={items}
       onClick={handleClick}
     />

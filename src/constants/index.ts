@@ -3,3 +3,4 @@ export * from './date-format';
 export * from './http-status';
 export * from './roles';
 export * from './routes';
+export * from './colors';
