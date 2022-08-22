@@ -36,7 +36,7 @@ export const getDetailClaim = async (param: number) => {
   return response.data;
 };
 
-export const startProgressVerify = async (param: string) => {
+export const startProgressVerify = async (param: number) => {
   const response = await httpProvider.post<any>(
     `claim/start-progress/${param}`,
     {},
@@ -44,7 +44,7 @@ export const startProgressVerify = async (param: string) => {
   return response.data;
 };
 
-export const businessVerified = async (param: string) => {
+export const businessVerified = async (param: number) => {
   const response = await httpProvider.post<any>(
     `claim/business-verified/${param}`,
     {},
@@ -52,7 +52,7 @@ export const businessVerified = async (param: string) => {
   return response.data;
 };
 
-export const cancelClaim = async (param: string) => {
+export const cancelClaim = async (param: number) => {
   const response = await httpProvider.post<any>(
     `claim/cancel-claim/${param}`,
     {},
@@ -60,7 +60,7 @@ export const cancelClaim = async (param: string) => {
   return response.data;
 };
 
-export const medicalVerified = async (param: string) => {
+export const medicalVerified = async (param: number) => {
   const response = await httpProvider.post<any>(
     `claim/medical-verified/${param}`,
     {},
@@ -73,7 +73,7 @@ export const rejectClaim = async (param: IClaimRejectRequestDTO) => {
   return response.data;
 };
 
-export const approveClaim = async (param: string) => {
+export const approveClaim = async (param: number) => {
   const response = await httpProvider.post<any>(`claim/approve/${param}`, {});
   return response.data;
 };

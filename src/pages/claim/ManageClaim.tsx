@@ -28,13 +28,15 @@ import { isVerifyingStatus } from 'helper';
 import _ from 'lodash';
 import moment from 'moment';
 import { IClaim, QueryParams } from 'pages/claim/types';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   approveClaim,
   businessVerified,
   getClaims,
   getDetailClaim,
   medicalVerified,
+  rejectClaim,
+  settleClaim,
   startProgressVerify,
 } from 'services/claim.service';
 import DetailClaim from './DetailClaim';
@@ -43,20 +45,22 @@ import SettleForm from './form/settle-form';
 
 const { Column } = Table;
 
+interface IDialog {
+  title: string;
+  content: string;
+  onOK: () => void;
+  onCancel: () => void;
+}
+
 interface IClaimPageState {
   claimList: IClaim[];
   currentRowData: IClaim;
   confirmVisible: boolean;
   rejectVisible: boolean;
   settleVisible: boolean;
-  rejectLoadding: boolean;
+  rejectLoading: boolean;
   settleLoading: boolean;
-  dialogContent?: {
-    title: string;
-    content: string;
-    onOK: () => void;
-    onCancel: () => void;
-  };
+  dialogContent?: IDialog;
 }
 
 const ManageClaim = () => {
@@ -69,7 +73,7 @@ const ManageClaim = () => {
     confirmVisible: false,
     rejectVisible: false,
     settleVisible: false,
-    rejectLoadding: false,
+    rejectLoading: false,
     settleLoading: false,
   };
 
@@ -100,7 +104,7 @@ const ManageClaim = () => {
     claimList,
     currentRowData,
     confirmVisible,
-    rejectLoadding,
+    rejectLoading,
     rejectVisible,
     settleLoading,
     settleVisible,
@@ -113,7 +117,7 @@ const ManageClaim = () => {
       return {
         ...claim,
         memberName: claim.memberResponseDTO.memberName,
-        // status : ,
+        status: claim.statusCode,
         benefitName: claim.benefitResponseDTO.benefitName,
         clientName: claim.clientResponseDTO.clientName,
         lastModified: moment(claim.modifiedOn, DateFormat.YYYYMMDDT).format(
@@ -132,7 +136,7 @@ const ManageClaim = () => {
             claimList: res.rows,
             currentRowData: {} as IClaim,
             confirmVisible: false,
-            rejectLoadding: false,
+            rejectLoading: false,
             rejectVisible: false,
             settleLoading: false,
             settleVisible: false,
@@ -170,7 +174,7 @@ const ManageClaim = () => {
   };
 
   useEffect(() => {
-    if (claimNo) {
+    if (claimNo && !confirmVisible && !rejectVisible && !settleVisible) {
       getClaim(claimNo);
     }
   }, [claimNo]);
@@ -273,7 +277,7 @@ const ManageClaim = () => {
 
   const startProgress = async (claim: IClaim) => {
     dispatch(showLoading(true));
-    startProgressVerify(claim.statusCode)
+    startProgressVerify(claim.claimNo)
       .then(res => {
         if (res) {
           if (_.isEmpty(res)) return;
@@ -296,12 +300,17 @@ const ManageClaim = () => {
       })
       .finally(() => {
         dispatch(showLoading(false));
+        setClaimPageState({
+          ...claimPageState,
+          confirmVisible: false,
+          dialogContent: {} as IDialog,
+        });
       });
   };
 
   const business = async (claim: IClaim) => {
     dispatch(showLoading(true));
-    businessVerified(claim.statusCode)
+    businessVerified(claim.claimNo)
       .then(res => {
         if (res) {
           if (_.isEmpty(res)) return;
@@ -324,12 +333,17 @@ const ManageClaim = () => {
       })
       .finally(() => {
         dispatch(showLoading(false));
+        setClaimPageState({
+          ...claimPageState,
+          confirmVisible: false,
+          dialogContent: {} as IDialog,
+        });
       });
   };
 
   const medical = async (claim: IClaim) => {
     dispatch(showLoading(true));
-    medicalVerified(claim.statusCode)
+    medicalVerified(claim.claimNo)
       .then(res => {
         if (res) {
           if (_.isEmpty(res)) return;
@@ -352,12 +366,17 @@ const ManageClaim = () => {
       })
       .finally(() => {
         dispatch(showLoading(false));
+        setClaimPageState({
+          ...claimPageState,
+          confirmVisible: false,
+          dialogContent: {} as IDialog,
+        });
       });
   };
 
   const approve = async (claim: IClaim) => {
     dispatch(showLoading(true));
-    approveClaim(claim.statusCode)
+    approveClaim(claim.claimNo)
       .then(res => {
         if (res) {
           if (_.isEmpty(res)) return;
@@ -380,6 +399,11 @@ const ManageClaim = () => {
       })
       .finally(() => {
         dispatch(showLoading(false));
+        setClaimPageState({
+          ...claimPageState,
+          confirmVisible: false,
+          dialogContent: {} as IDialog,
+        });
       });
   };
 
@@ -390,7 +414,7 @@ const ManageClaim = () => {
       ...claimPageState,
       rejectVisible: false,
       settleVisible: false,
-      currentRowData: {} as IClaim,
+      confirmVisible: false,
     });
   };
 
@@ -409,6 +433,109 @@ const ManageClaim = () => {
           handleCancel();
         },
       },
+    });
+  };
+
+  const handleVerify = (claim: IClaim) => {
+    setClaimPageState({
+      ...claimPageState,
+      confirmVisible: true,
+      currentRowData: { ...claim },
+      dialogContent: {
+        title: 'Phê duyệt yêu cầu bồi thường',
+        content: `Bạn có đồng ý phê duyệt yêu cầu bồi thường có mã ${claim.claimID}`,
+        onOK: () => {
+          switch (user.role) {
+            case ROLE.BUSINESS_APPRAISER:
+              business(claim);
+              break;
+            case ROLE.MEDICAL_APPRAISER:
+              medical(claim);
+              break;
+            case ROLE.HEALTH_MODERATOR:
+              approve(claim);
+              break;
+            default:
+              handleCancel();
+              break;
+          }
+        },
+        onCancel: () => {
+          handleCancel();
+        },
+      },
+    });
+  };
+
+  const handleReject = (claim: IClaim) => {
+    setClaimPageState({
+      ...claimPageState,
+      rejectVisible: true,
+      currentRowData: { ...claim },
+    });
+  };
+
+  const handleRejectOK = () => {
+    formReject.validateFields().then(() => {
+      const fieldValue = formReject.getFieldsValue();
+      fieldValue.claimNo = claimNo;
+      setClaimPageState({ ...claimPageState, rejectLoading: true });
+      rejectClaim(fieldValue)
+        .then(res => {
+          formReject.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Từ chối yêu cầu bồi thường thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} đã bị từ chối`,
+            'bottomLeft',
+          );
+          getClaimList({ pagination });
+        })
+        .catch(() => {
+          openNotificationWithIcon(
+            'error',
+            'Từ chối yêu cầu bồi thường không thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} chưa bị từ chối`,
+            'bottomLeft',
+          );
+          setClaimPageState({ ...claimPageState, rejectLoading: false });
+        });
+    });
+  };
+
+  const handleSettle = (claim: IClaim) => {
+    setClaimPageState({
+      ...claimPageState,
+      settleVisible: true,
+      currentRowData: { ...claim },
+    });
+  };
+
+  const handleSettleOK = () => {
+    formSettle.validateFields().then(() => {
+      const fieldValue = formSettle.getFieldsValue();
+      fieldValue.claimNo = claimNo;
+      setClaimPageState({ ...claimPageState, settleLoading: true });
+      settleClaim(fieldValue)
+        .then(res => {
+          formSettle.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Thanh toán yêu cầu bồi thường thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} đã được thanh toán`,
+            'bottomLeft',
+          );
+          getClaimList({ pagination });
+        })
+        .catch(() => {
+          openNotificationWithIcon(
+            'error',
+            'Thanh toán yêu cầu bồi thường không thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} chưa được thanh toán`,
+            'bottomLeft',
+          );
+          setClaimPageState({ ...claimPageState, settleLoading: false });
+        });
     });
   };
 
@@ -460,31 +587,30 @@ const ManageClaim = () => {
           <>
             <FileDoneOutlined
               style={{ fontSize: '200%', color: '#52c41a' }}
-              onClick={() => {
-                switch (role) {
-                  case ROLE.BUSINESS_APPRAISER:
-                    business(claim);
-                    break;
-                  case ROLE.MEDICAL_APPRAISER:
-                    medical(claim);
-                    break;
-                  case ROLE.HEALTH_MODERATOR:
-                    approve(claim);
-                    break;
-                  case ROLE.ACCOUNTANT:
-                    break;
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                if (user.role === ROLE.ACCOUNTANT) {
+                  handleSettle(claim);
+                } else {
+                  handleVerify(claim);
                 }
               }}
             />
             <Divider type="vertical" style={{ fontSize: '200%' }} />
-            <FileExcelOutlined style={{ fontSize: '200%', color: '#ff4d4f' }} />
+            <FileExcelOutlined
+              style={{ fontSize: '200%', color: '#ff4d4f' }}
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                handleReject(claim);
+              }}
+            />
           </>
         );
       } else {
         return (
           <ExportOutlined
             style={{ fontSize: '200%', color: '#faad14' }}
-            onClick={(e: any) => {
+            onClick={(e: MouseEvent) => {
               e.stopPropagation();
               handleStartProgress(claim);
             }}
@@ -567,40 +693,30 @@ const ManageClaim = () => {
             </Table>
           </Card>
           {!_.isEmpty(claim) && <DetailClaim ref={ref} claim={claim} />}
-          {/* <RejectForm
+          <RejectForm
             claim={currentRowData}
-            confirmLoading={rejectLoadding}
+            confirmLoading={rejectLoading}
             form={formReject}
             visible={rejectVisible}
-            onOk={}
-            onCancel={}
+            onOk={handleRejectOK}
+            onCancel={handleCancel}
           />
           <SettleForm
             claim={currentRowData}
             confirmLoading={settleLoading}
             form={formSettle}
             visible={settleVisible}
-            onOk={}
-            onCancel={}
-          /> */}
-          {/* <ConfirmDialog
-            visible={v}
-            title="Xóa nhân viên"
-            content={`Bạn có đồng ý xóa nhân viên ${currentRowData.employeeName} hay không?`}
-            onOK={() =>
-              handleDeleteEmployee(
-                currentRowData.employeeNo,
-                currentRowData.employeeID,
-              )
-            }
-            onCancel={() =>
-              setEmployeePageState({
-                ...employeePageState,
-                currentRowData: {} as IEmployee,
-                deleteModelVisible: false,
-              })
-            }
-          /> */}
+            onOk={handleSettleOK}
+            onCancel={handleCancel}
+          />
+
+          <ConfirmDialog
+            visible={confirmVisible}
+            title={dialogContent?.title || ''}
+            content={dialogContent?.content || ''}
+            onOK={dialogContent?.onOK || handleCancel}
+            onCancel={dialogContent?.onCancel || handleCancel}
+          />
         </div>
       )}
     </>

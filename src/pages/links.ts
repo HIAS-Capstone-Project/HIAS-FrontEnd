@@ -53,11 +53,6 @@ const links: any = {
       readonly: false,
     },
     {
-      to: '/member',
-      name: 'Manage Member',
-      readonly: true,
-    },
-    {
       to: '/service-provider',
       name: 'Manage Service Provider',
       readonly: true,
