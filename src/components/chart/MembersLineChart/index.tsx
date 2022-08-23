@@ -54,8 +54,8 @@ const MembersLineChart = ({ role }: MembersLineChartIF) => {
 
   useEffect(() => {
     chartOnboardYear().then((response: any) => {
-      setRes(response.data);
-      dispatch(setRoles(response.data[0]?.roles));
+      setRes(response.data.lines);
+      dispatch(setRoles(response.data?.roles));
     });
   }, []);
 
@@ -70,7 +70,7 @@ const MembersLineChart = ({ role }: MembersLineChartIF) => {
   const dataCharts = res.map((e: any, i: number) => {
     e.statistics.forEach((statistic: any) => labels.push(statistic.key));
     return {
-      label: 'label',
+      label: e.chartName,
       data: e.statistics.map((value: any) => value.value),
       borderColor: color,
       backgroundColor: color,
@@ -81,7 +81,7 @@ const MembersLineChart = ({ role }: MembersLineChartIF) => {
     labels,
     datasets: dataCharts,
   };
-  return <Line options={options} data={data} />;
+  return <Line options={options} data={data} style={{ maxHeight: 500 }} />;
 };
 
 export default MembersLineChart;

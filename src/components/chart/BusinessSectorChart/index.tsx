@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { locationChart } from 'services/dashboard.service';
+import { businessSector } from 'services/dashboard.service';
 import { Row, Col } from 'antd';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
+import randomColor from 'randomcolor';
 import {
   selectRoles,
   setPermissions,
   setRoles,
 } from 'features/layout/layoutSlice';
-import randomColor from 'randomcolor';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -21,22 +21,23 @@ export const options = {
     },
     title: {
       display: true,
-      text: 'Member location chart',
+      text: 'Business sectors',
     },
   },
 };
-interface LocationChartIF {
+
+interface BussinessPieChartIF {
   role: string | undefined;
 }
 
-const LocationChart = ({ role }: LocationChartIF) => {
+const BussinessSector = ({ role }: BussinessPieChartIF) => {
   const [res, setRes] = useState([]);
   const label: any = [];
   const value: any = [];
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    locationChart().then((response: any) => {
+    businessSector().then((response: any) => {
       setRes(response.data.statistics);
       dispatch(setRoles(response.data?.roles));
     });
@@ -51,7 +52,7 @@ const LocationChart = ({ role }: LocationChartIF) => {
     labels: label,
     datasets: [
       {
-        label: '# of Votes',
+        label: 'Age',
         data: value,
         backgroundColor: res.map(() => {
           const color = randomColor();
@@ -83,4 +84,4 @@ const LocationChart = ({ role }: LocationChartIF) => {
   );
 };
 
-export default LocationChart;
+export default BussinessSector;

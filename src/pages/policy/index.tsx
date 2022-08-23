@@ -10,12 +10,15 @@ import {
   TablePaginationConfig,
 } from 'antd';
 import Column from 'antd/lib/table/Column';
+import { useAppSelector } from 'app/hooks';
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import _ from 'lodash';
 import { IBenefit } from 'pages/benefit/types';
 import { IClient } from 'pages/client/types';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { getAllBenefit } from 'services/benefit.service';
 import { getAllClient } from 'services/client.service';
 import {
@@ -28,6 +31,7 @@ import { NOT_ACCEPTABLE } from './../../constants/http-status';
 import AddPolicyForm from './form/add-policy-form';
 import EditPolicyForm from './form/edit-policy-form';
 import { IPolicy, QueryParams } from './types';
+import dashboardLinks from '../../pages/links';
 
 interface IPolicyPageState {
   policyList: IPolicy[];
@@ -43,6 +47,12 @@ interface IPolicyPageState {
 const PolicyPage = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const initialState = {
     policyList: [] as IPolicy[],
@@ -270,9 +280,11 @@ const PolicyPage = () => {
       style={{ justifyContent: 'space-between', width: '100%' }}
     >
       <span>
-        <Button size="large" type="primary" onClick={handleAddPolicy}>
-          Thêm Chính sách
-        </Button>
+        {!readonly && (
+          <Button size="large" type="primary" onClick={handleAddPolicy}>
+            Thêm Chính sách
+          </Button>
+        )}
       </span>
       <Input.Search
         placeholder="Nhập vào giá trị muốn tìm kiếm"
@@ -337,34 +349,36 @@ const PolicyPage = () => {
             key="clientName"
             align="center"
           />
-          <Column
-            title="Thao tác"
-            key="action"
-            align="center"
-            render={(text, row: IPolicy) => (
-              <span>
-                <EditTwoTone
-                  style={{ fontSize: '200%' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleEditPolicy(row);
-                  }}
-                />
-                <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <DeleteOutlined
-                  style={{ fontSize: '200%', color: '#ff4d4f' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    setPolicyPageState({
-                      ...policyPageState,
-                      currentRowData: row,
-                      deleteModelVisible: true,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          />
+          {!readonly && (
+            <Column
+              title="Thao tác"
+              key="action"
+              align="center"
+              render={(text, row: IPolicy) => (
+                <span>
+                  <EditTwoTone
+                    style={{ fontSize: '200%' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleEditPolicy(row);
+                    }}
+                  />
+                  <Divider type="vertical" style={{ fontSize: '200%' }} />
+                  <DeleteOutlined
+                    style={{ fontSize: '200%', color: '#ff4d4f' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      setPolicyPageState({
+                        ...policyPageState,
+                        currentRowData: row,
+                        deleteModelVisible: true,
+                      });
+                    }}
+                  />
+                </span>
+              )}
+            />
+          )}
         </Table>
       </Card>
       <EditPolicyForm

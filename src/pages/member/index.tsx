@@ -9,18 +9,22 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import { useAppSelector } from 'app/hooks';
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
 import DateFormat from 'constants/date-format';
 import { NOT_ACCEPTABLE } from 'constants/http-status';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import _ from 'lodash';
 import moment from 'moment';
 import { IClient } from 'pages/client/types';
 import { IBank, IProvince } from 'pages/member/types';
 import { IPolicy } from 'pages/policy/types';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { getAllBank } from 'services/bank.service';
 import { getAllClient } from 'services/client.service';
+import dashboardLinks from '../../pages/links';
 import {
   addMember,
   deleteMember,
@@ -48,6 +52,12 @@ interface IMemberPageState {
 const MemberPage = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const initialState = {
     memberList: [] as IMember[],
@@ -305,9 +315,11 @@ const MemberPage = () => {
       style={{ justifyContent: 'space-between', width: '100%' }}
     >
       <span>
-        <Button size="large" type="primary" onClick={handleAddMember}>
-          Thêm Thành viên
-        </Button>
+        {!readonly && (
+          <Button size="large" type="primary" onClick={handleAddMember}>
+            Thêm Thành viên
+          </Button>
+        )}
       </span>
       <Input.Search
         placeholder="Nhập vào giá trị muốn tìm kiếm"
@@ -367,7 +379,7 @@ const MemberPage = () => {
             align="center"
           />
           <Column
-            title="Tên công ty"
+            title="Tên doanh nghiệp"
             dataIndex="clientName"
             key="clientName"
             align="center"
@@ -380,34 +392,36 @@ const MemberPage = () => {
             key="phoneNumber"
             align="center"
           />
-          <Column
-            title="Thao tác"
-            key="action"
-            align="center"
-            render={(text, row: IMember) => (
-              <span>
-                <EditTwoTone
-                  style={{ fontSize: '200%' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleEditMember(row);
-                  }}
-                />
-                <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <DeleteOutlined
-                  style={{ fontSize: '200%', color: '#ff4d4f' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    setMemberPageState({
-                      ...memberPageState,
-                      currentRowData: row,
-                      deleteModelVisible: true,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          />
+          {!readonly && (
+            <Column
+              title="Thao tác"
+              key="action"
+              align="center"
+              render={(text, row: IMember) => (
+                <span>
+                  <EditTwoTone
+                    style={{ fontSize: '200%' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleEditMember(row);
+                    }}
+                  />
+                  <Divider type="vertical" style={{ fontSize: '200%' }} />
+                  <DeleteOutlined
+                    style={{ fontSize: '200%', color: '#ff4d4f' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      setMemberPageState({
+                        ...memberPageState,
+                        currentRowData: row,
+                        deleteModelVisible: true,
+                      });
+                    }}
+                  />
+                </span>
+              )}
+            />
+          )}
         </Table>
       </Card>
       <EditMemberForm

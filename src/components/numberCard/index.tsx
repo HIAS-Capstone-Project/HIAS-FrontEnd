@@ -19,7 +19,9 @@ const NumberCard = ({ icon, color, title, number, countUp }: any) => {
         {iconMap[icon]}
       </span>
       <div className="content">
-        <p className="title">{title || 'No Title'}</p>
+        <p className="title" style={{ fontWeight: 'bold' }}>
+          {title || 'No Title'}
+        </p>
         <p className="number">
           <CountUp
             start={0}

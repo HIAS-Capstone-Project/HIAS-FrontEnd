@@ -10,12 +10,15 @@ import {
   TablePaginationConfig,
 } from 'antd';
 import Column from 'antd/lib/table/Column';
+import { useAppSelector } from 'app/hooks';
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
 import DateFormat from 'constants/date-format';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import _ from 'lodash';
 import moment from 'moment';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { getDepartments } from 'services/department.service';
 import {
   addEmployee,
@@ -28,6 +31,7 @@ import { NOT_ACCEPTABLE } from './../../constants/http-status';
 import AddEmployeeForm from './form/add-employee-form';
 import EditEmployeeForm from './form/edit-employee-form';
 import { IDepartment, IEmployee, IEmploymentType, QueryParams } from './types';
+import dashboardLinks from '../../pages/links';
 
 interface IEmployeePageState {
   employeeList: IEmployee[];
@@ -43,6 +47,12 @@ interface IEmployeePageState {
 const EmployeePage = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const initialState = {
     employeeList: [] as IEmployee[],
@@ -291,9 +301,11 @@ const EmployeePage = () => {
       style={{ justifyContent: 'space-between', width: '100%' }}
     >
       <span>
-        <Button size="large" type="primary" onClick={handleAddEmployee}>
-          Thêm Nhân viên
-        </Button>
+        {!readonly && (
+          <Button size="large" type="primary" onClick={handleAddEmployee}>
+            Thêm Nhân viên
+          </Button>
+        )}
       </span>
       <Input.Search
         placeholder="Nhập vào giá trị muốn tìm kiếm"
@@ -378,34 +390,36 @@ const EmployeePage = () => {
             key="phoneNumber"
             align="center"
           />
-          <Column
-            title="Thao tác"
-            key="action"
-            align="center"
-            render={(text, row: IEmployee) => (
-              <span>
-                <EditTwoTone
-                  style={{ fontSize: '200%' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleEditEmployee(row);
-                  }}
-                />
-                <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <DeleteOutlined
-                  style={{ fontSize: '200%', color: '#ff4d4f' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    setEmployeePageState({
-                      ...employeePageState,
-                      currentRowData: row,
-                      deleteModelVisible: true,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          />
+          {!readonly && (
+            <Column
+              title="Thao tác"
+              key="action"
+              align="center"
+              render={(text, row: IEmployee) => (
+                <span>
+                  <EditTwoTone
+                    style={{ fontSize: '200%' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleEditEmployee(row);
+                    }}
+                  />
+                  <Divider type="vertical" style={{ fontSize: '200%' }} />
+                  <DeleteOutlined
+                    style={{ fontSize: '200%', color: '#ff4d4f' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      setEmployeePageState({
+                        ...employeePageState,
+                        currentRowData: row,
+                        deleteModelVisible: true,
+                      });
+                    }}
+                  />
+                </span>
+              )}
+            />
+          )}
         </Table>
       </Card>
       <EditEmployeeForm

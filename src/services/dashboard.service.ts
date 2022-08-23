@@ -39,3 +39,8 @@ export const policyByUsageChart = async () => {
   const response = await httpProvider.get<any>('chart/policy-by-usage');
   return response;
 };
+
+export const findAll = async () => {
+  const response = await httpProvider.get<any>('chart/find-all');
+  return response;
+};

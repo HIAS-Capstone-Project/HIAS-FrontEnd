@@ -322,9 +322,12 @@ const EditMemberForm = (props: UpdateFormProps) => {
 
         <Form.Item
           name="clientNo"
-          label="Tên công ty:"
+          label="Tên doanh nghiệp:"
           rules={[
-            { required: true, message: 'Hãy chọn tên công ty của thành viên' },
+            {
+              required: true,
+              message: 'Hãy chọn tên doanh nghiệp của thành viên',
+            },
           ]}
         >
           <Select
@@ -338,7 +341,7 @@ const EditMemberForm = (props: UpdateFormProps) => {
             }}
             showSearch
             size="large"
-            placeholder="Chọn tên công ty"
+            placeholder="Chọn tên doanh nghiệp"
             optionFilterProp="children"
           >
             {clientList.map(client => {

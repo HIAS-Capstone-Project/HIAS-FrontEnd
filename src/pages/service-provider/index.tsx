@@ -24,6 +24,10 @@ import AddServiceProviderForm from './form/add-service-provider-form';
 import EditServiceProviderForm from './form/edit-service-provider';
 import { IServiceProvider } from './types';
 const { Column } = Table;
+import dashboardLinks from '../../pages/links';
+import { useAppSelector } from 'app/hooks';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
+import { useLocation } from 'react-router';
 
 interface ServiceProviderPageState {
   serviceProviderList: IServiceProvider[];
@@ -39,6 +43,12 @@ interface ServiceProviderPageState {
 const ServiceProviderPage = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const initialState = {
     serviceProviderList: [] as IServiceProvider[],
@@ -247,9 +257,15 @@ const ServiceProviderPage = () => {
       style={{ justifyContent: 'space-between', width: '100%' }}
     >
       <span>
-        <Button size="large" type="primary" onClick={handleAddServiceProvider}>
-          Thêm Cơ sở khám chữa bệnh
-        </Button>
+        {!readonly && (
+          <Button
+            size="large"
+            type="primary"
+            onClick={handleAddServiceProvider}
+          >
+            Thêm Cơ sở khám chữa bệnh
+          </Button>
+        )}
       </span>
       <Input.Search
         placeholder="Nhập vào giá trị muốn tìm kiếm"
@@ -315,34 +331,36 @@ const ServiceProviderPage = () => {
             align="center"
           />
           <Column title="Email" dataIndex="email" key="email" align="center" />
-          <Column
-            title="Thao tác"
-            key="action"
-            align="center"
-            render={(text, row: IServiceProvider) => (
-              <span>
-                <EditTwoTone
-                  style={{ fontSize: '200%' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleEditServiceProvider(row);
-                  }}
-                />
-                <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <DeleteOutlined
-                  style={{ fontSize: '200%', color: '#ff4d4f' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    setServiceProviderPageState({
-                      ...serviceProviderPageState,
-                      currentRowData: row,
-                      deleteModelVisible: true,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          />
+          {!readonly && (
+            <Column
+              title="Thao tác"
+              key="action"
+              align="center"
+              render={(text, row: IServiceProvider) => (
+                <span>
+                  <EditTwoTone
+                    style={{ fontSize: '200%' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleEditServiceProvider(row);
+                    }}
+                  />
+                  <Divider type="vertical" style={{ fontSize: '200%' }} />
+                  <DeleteOutlined
+                    style={{ fontSize: '200%', color: '#ff4d4f' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      setServiceProviderPageState({
+                        ...serviceProviderPageState,
+                        currentRowData: row,
+                        deleteModelVisible: true,
+                      });
+                    }}
+                  />
+                </span>
+              )}
+            />
+          )}
         </Table>
       </Card>
       <EditServiceProviderForm

@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { chartAge } from 'services/dashboard.service';
+import { policyByUsageChart } from 'services/dashboard.service';
 import { Row, Col } from 'antd';
+import randomColor from 'randomcolor';
+import { useAppDispatch, useAppSelector } from 'app/hooks';
+import {
+  selectRoles,
+  setPermissions,
+  setRoles,
+} from 'features/layout/layoutSlice';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -27,9 +34,13 @@ const AgePieChart = ({ role }: AgePieChartIF) => {
   const [res, setRes] = useState([]);
   const label: any = [];
   const value: any = [];
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    chartAge().then((response: any) => setRes(response.data.statistics));
+    policyByUsageChart().then((response: any) => {
+      setRes(response.data.statistics);
+      dispatch(setRoles(response.data?.roles));
+    });
   }, []);
 
   res.forEach((i: any) => {
@@ -43,23 +54,30 @@ const AgePieChart = ({ role }: AgePieChartIF) => {
       {
         label: '# of Votes',
         data: value,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-        ],
+        backgroundColor: res.map(() => {
+          const color = randomColor();
+          return color;
+        }),
+        borderColor: res.map(() => {
+          const color = randomColor();
+          return color;
+        }),
         borderWidth: 1,
       },
     ],
   };
+
+  const roles = useAppSelector(selectRoles);
+
+  if (roles.includes(role)) {
+    dispatch(setPermissions(true));
+  } else {
+    return <></>;
+  }
+
   return (
-    <Row>
-      <Col>
+    <Row style={{ justifyContent: 'center' }}>
+      <Col style={{ width: '50%' }}>
         <Pie options={options} data={data} />
       </Col>
     </Row>

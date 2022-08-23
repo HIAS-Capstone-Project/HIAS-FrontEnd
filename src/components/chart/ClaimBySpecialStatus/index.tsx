@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { locationChart } from 'services/dashboard.service';
+import { claimBySpecialStatusChart } from 'services/dashboard.service';
 import { Row, Col } from 'antd';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import {
@@ -21,7 +21,7 @@ export const options = {
     },
     title: {
       display: true,
-      text: 'Member location chart',
+      text: 'Claim with status: Approve, Legal Reject, Violation',
     },
   },
 };
@@ -29,14 +29,14 @@ interface LocationChartIF {
   role: string | undefined;
 }
 
-const LocationChart = ({ role }: LocationChartIF) => {
+const ClaimBySpecialStatus = ({ role }: LocationChartIF) => {
   const [res, setRes] = useState([]);
   const label: any = [];
   const value: any = [];
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    locationChart().then((response: any) => {
+    claimBySpecialStatusChart().then((response: any) => {
       setRes(response.data.statistics);
       dispatch(setRoles(response.data?.roles));
     });
@@ -83,4 +83,4 @@ const LocationChart = ({ role }: LocationChartIF) => {
   );
 };
 
-export default LocationChart;
+export default ClaimBySpecialStatus;

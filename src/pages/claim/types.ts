@@ -62,6 +62,14 @@ export interface IClaimPaymentRequestDTO {
   remark: string;
 }
 
+export interface IClaimUpdateRequestDTO {
+  approvedBy?: number;
+  businessAppraisalBy?: number;
+  claimNo: number;
+  medicalAppraisalBy?: number;
+  paidBy?: number;
+}
+
 export interface FormProps {
   claim: IClaim;
   visible: boolean;

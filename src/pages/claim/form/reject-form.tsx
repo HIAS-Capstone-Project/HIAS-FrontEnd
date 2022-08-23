@@ -1,6 +1,21 @@
 import { Form, Input, Modal, Select } from 'antd';
 import { FormProps } from '../types';
 
+const options = [
+  {
+    value: 'RE001',
+    children: 'Chứng từ không đầy đủ',
+  },
+  {
+    value: 'RE002',
+    children: 'Chứng từ không hợp lệ',
+  },
+  {
+    value: 'RE003',
+    children: 'Lý do khác',
+  },
+];
+
 const RejectForm = (props: FormProps) => {
   const { form, visible, onCancel, onOk, confirmLoading, claim } = props;
 
@@ -24,16 +39,10 @@ const RejectForm = (props: FormProps) => {
           rules={[{ required: true, message: 'Hãy chọn loại lý do' }]}
         >
           <Select
-            // onSelect={(departmentNo: number) => {
-            //   const option = departments.find(
-            //     item => item.departmentNo === departmentNo,
-            //   );
-            //   setEmploymentTypes(option?.list || []);
-            //   form.resetFields(['employmentTypeNo']);
-            // }}
+            // options={options}
             showSearch
             size="large"
-            placeholder="Chọn kiểu lý do"
+            placeholder="Chọn loại lý do"
             optionFilterProp="children"
             filterOption={(input, option) =>
               (option!.children as unknown as string).includes(input)
@@ -46,29 +55,29 @@ const RejectForm = (props: FormProps) => {
                 )
             }
           >
-            {/* {departments.map(department => {
+            {options.map(option => {
               return (
-                <Select.Option
-                  key={department.departmentNo}
-                  value={department.departmentNo}
-                >
-                  {department.departmentName}
+                <Select.Option key={option.value} value={option.value}>
+                  {option.children}
                 </Select.Option>
               );
-            })} */}
+            })}
           </Select>
         </Form.Item>
         <Form.Item
           name="rejectReason"
-          label="Lí do:"
+          label="Chi tiết lý do:"
           rules={[
-            { required: true, message: 'Hãy nhập vào lí do từ chối yêu cầu' },
+            {
+              required: true,
+              message: 'Hãy nhập vào chi tiết lý do từ chối yêu cầu',
+            },
           ]}
         >
           <Input.TextArea
             autoComplete="false"
             size="large"
-            placeholder="Nhập vào lí do từ chối yêu cầu"
+            placeholder="Nhập vào chi tiết lý do từ chối yêu cầu"
           />
         </Form.Item>
       </Form>

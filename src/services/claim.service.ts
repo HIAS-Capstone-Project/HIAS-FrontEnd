@@ -3,6 +3,7 @@ import { IClaimResponse } from 'models/claim/types';
 import {
   IClaim,
   IClaimPaymentRequestDTO,
+  IClaimUpdateRequestDTO,
   QueryParams,
 } from 'pages/claim/types';
 import queryString from 'query-string';
@@ -80,5 +81,10 @@ export const approveClaim = async (param: number) => {
 
 export const settleClaim = async (param: IClaimPaymentRequestDTO) => {
   const response = await httpProvider.post<any>('claim/settle-claim', param);
+  return response.data;
+};
+
+export const updateClaim = async (param: IClaimUpdateRequestDTO) => {
+  const response = await httpProvider.put<any>('claim/update', param);
   return response.data;
 };

@@ -1,4 +1,6 @@
 import {
+  CloseCircleOutlined,
+  EditTwoTone,
   ExportOutlined,
   FileDoneOutlined,
   FileExcelOutlined,
@@ -29,6 +31,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import { IClaim, QueryParams } from 'pages/claim/types';
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import {
   approveClaim,
   businessVerified,
@@ -38,10 +42,14 @@ import {
   rejectClaim,
   settleClaim,
   startProgressVerify,
+  updateClaim,
 } from 'services/claim.service';
+import { cancelClaim } from './../../services/claim.service';
 import DetailClaim from './DetailClaim';
+import AssignForm from './form/assign-form';
 import RejectForm from './form/reject-form';
 import SettleForm from './form/settle-form';
+import dashboardLinks from '../../pages/links';
 
 const { Column } = Table;
 
@@ -61,12 +69,15 @@ interface IClaimPageState {
   rejectLoading: boolean;
   settleLoading: boolean;
   dialogContent?: IDialog;
+  assignLoading: boolean;
+  assignVisible: boolean;
 }
 
 const ManageClaim = () => {
   const dispatch = useAppDispatch();
   const layout = useAppSelector(selectLayout);
   const user = useAppSelector(selectCurrentUser) as IUser;
+  const navigate = useNavigate();
   const initialState = {
     claimList: [] as IClaim[],
     currentRowData: {} as IClaim,
@@ -75,10 +86,18 @@ const ManageClaim = () => {
     settleVisible: false,
     rejectLoading: false,
     settleLoading: false,
+    assignLoading: false,
+    assignVisible: false,
   };
 
   const [formSettle] = Form.useForm();
   const [formReject] = Form.useForm();
+  const [formAssign] = Form.useForm();
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const ref = useRef<any>(null);
   const [claimPageState, setClaimPageState] =
@@ -108,6 +127,8 @@ const ManageClaim = () => {
     rejectVisible,
     settleLoading,
     settleVisible,
+    assignLoading,
+    assignVisible,
     dialogContent,
   } = claimPageState;
   const { claimNo } = currentRowData;
@@ -140,6 +161,8 @@ const ManageClaim = () => {
             rejectVisible: false,
             settleLoading: false,
             settleVisible: false,
+            assignLoading: false,
+            assignVisible: false,
           });
           setPagination({
             ...pagination,
@@ -174,7 +197,13 @@ const ManageClaim = () => {
   };
 
   useEffect(() => {
-    if (claimNo && !confirmVisible && !rejectVisible && !settleVisible) {
+    if (
+      claimNo &&
+      !confirmVisible &&
+      !rejectVisible &&
+      !settleVisible &&
+      !assignVisible
+    ) {
       getClaim(claimNo);
     }
   }, [claimNo]);
@@ -204,17 +233,19 @@ const ManageClaim = () => {
         direction="horizontal"
         // style={{ justifyContent: 'space-between', width: '100%' }}
       >
-        <Button
-          size="large"
-          type="primary"
-          // onClick={}
-        >
-          Thêm Yêu cầu bồi thường
-        </Button>
+        {!readonly && (
+          <Button
+            size="large"
+            type="primary"
+            // onClick={}
+          >
+            Thêm Yêu cầu bồi thường
+          </Button>
+        )}
         <Select
           showSearch
           size="large"
-          placeholder="Chọn công ty"
+          placeholder="Chọn doanh nghiệp"
           optionFilterProp="children"
           filterOption={(input, option) =>
             (option!.children as unknown as string).includes(input)
@@ -295,6 +326,39 @@ const ManageClaim = () => {
           'error',
           'Quá trình thẩm định bắt đầu thất bại',
           `Xảy ra lỗi trong quá trình chuyển trạng thái của yêu cầu bồi thường có mã ${claim.claimID} `,
+          'bottomLeft',
+        );
+      })
+      .finally(() => {
+        dispatch(showLoading(false));
+        setClaimPageState({
+          ...claimPageState,
+          confirmVisible: false,
+          dialogContent: {} as IDialog,
+        });
+      });
+  };
+
+  const cancelClaimAction = async (claim: IClaim) => {
+    dispatch(showLoading(true));
+    cancelClaim(claim.claimNo)
+      .then(res => {
+        if (res) {
+          if (_.isEmpty(res)) return;
+          openNotificationWithIcon(
+            'success',
+            'Hủy yêu cầu bồi thường thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} đã bị hủy`,
+            'bottomLeft',
+          );
+          getClaimList({ pagination });
+        }
+      })
+      .catch(() => {
+        openNotificationWithIcon(
+          'error',
+          'Hủy yêu cầu bồi thường thất bại',
+          `Xảy ra lỗi trong quá trình hủy của yêu cầu bồi thường có mã ${claim.claimID} `,
           'bottomLeft',
         );
       })
@@ -415,6 +479,7 @@ const ManageClaim = () => {
       rejectVisible: false,
       settleVisible: false,
       confirmVisible: false,
+      assignVisible: false,
     });
   };
 
@@ -428,6 +493,24 @@ const ManageClaim = () => {
         content: `Bạn có đồng ý bắt đầu quá trình phê duyệt yêu cầu bồi thường có mã ${claim.claimID}`,
         onOK: () => {
           startProgress(claim);
+        },
+        onCancel: () => {
+          handleCancel();
+        },
+      },
+    });
+  };
+
+  const handleCancelClaim = (claim: IClaim) => {
+    setClaimPageState({
+      ...claimPageState,
+      confirmVisible: true,
+      currentRowData: { ...claim },
+      dialogContent: {
+        title: 'Hủy yêu cầu bồi thường',
+        content: `Bạn có đồng ý hủy yêu cầu bồi thường có mã ${claim.claimID} không?`,
+        onOK: () => {
+          cancelClaimAction(claim);
         },
         onCancel: () => {
           handleCancel();
@@ -539,6 +622,62 @@ const ManageClaim = () => {
     });
   };
 
+  const handleAssign = async (claim: IClaim) => {
+    dispatch(showLoading(true));
+    getDetailClaim(claim.claimNo)
+      .then(res => {
+        if (res) {
+          if (_.isEmpty(res)) return;
+          setClaimPageState({
+            ...claimPageState,
+            assignVisible: true,
+            currentRowData: { ...res },
+          });
+        }
+      })
+      .finally(() => {
+        dispatch(showLoading(false));
+      });
+  };
+
+  const handleAssignOK = () => {
+    formAssign.validateFields().then(() => {
+      const fieldValue = formAssign.getFieldsValue();
+      fieldValue.claimNo = claimNo;
+      delete fieldValue.benefitName;
+      delete fieldValue.claimID;
+      delete fieldValue.clientName;
+      delete fieldValue.memberName;
+      const value = {
+        ...fieldValue,
+        medicalAppraisalBy: fieldValue.medicalAppraisalBy || undefined,
+        approvedBy: fieldValue.approvedBy || undefined,
+        paidBy: fieldValue.paidBy || undefined,
+      };
+      setClaimPageState({ ...claimPageState, assignLoading: true });
+      updateClaim(value)
+        .then(res => {
+          formAssign.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Chỉnh sửa thông tin yêu cầu bồi thường thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} đã được chỉnh sửa người tham gia kiểm duyệt/thanh toán`,
+            'bottomLeft',
+          );
+          getClaimList({ pagination });
+        })
+        .catch(() => {
+          openNotificationWithIcon(
+            'error',
+            'Chỉnh sửa thông tin yêu cầu bồi thường không thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} chưa được chỉnh sửa người tham gia kiểm duyệt/thanh toán`,
+            'bottomLeft',
+          );
+          setClaimPageState({ ...claimPageState, assignLoading: false });
+        });
+    });
+  };
+
   const renderIcon = (claim: IClaim, role: string) => {
     let isShowIcon = false;
     switch (role) {
@@ -578,10 +717,37 @@ const ManageClaim = () => {
           isShowIcon = true;
         }
         break;
+      case ROLE.ADMIN:
+        if (
+          [
+            STATUS.SUBMITTED,
+            STATUS.BUSINESS_VERIFYING,
+            STATUS.BUSINESS_VERIFIED,
+            STATUS.MEDICAL_VERIFYING,
+            STATUS.MEDICAL_VERIFIED,
+            STATUS.WAITING_FOR_APPROVAL,
+            STATUS.APPROVED,
+            STATUS.PAYMENT_PROCESSING,
+          ].find(status => status.key === claim.statusCode)
+        ) {
+          isShowIcon = true;
+        }
+        break;
       default:
         isShowIcon = false;
     }
     if (isShowIcon) {
+      if (role === ROLE.ADMIN) {
+        return (
+          <EditTwoTone
+            style={{ fontSize: '200%' }}
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              handleAssign(claim);
+            }}
+          />
+        );
+      }
       if (isVerifyingStatus(claim.statusCode)) {
         return (
           <>
@@ -618,6 +784,29 @@ const ManageClaim = () => {
         );
       }
     }
+
+    if (claim.statusCode === STATUS.DRAFT.key) {
+      return (
+        <>
+          <EditTwoTone
+            style={{ fontSize: '200%' }}
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              navigate(`/create-claim/${claim.claimNo}`);
+            }}
+          />
+          <Divider type="vertical" style={{ fontSize: '200%' }} />
+          <CloseCircleOutlined
+            style={{ fontSize: '200%', color: '#ff4d4f' }}
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              handleCancelClaim(claim);
+            }}
+          />
+        </>
+      );
+    }
+
     return <></>;
   };
 
@@ -659,7 +848,7 @@ const ManageClaim = () => {
                 align="center"
               />
               <Column
-                title="Tên công ty"
+                title="Tên doanh nghiệp"
                 dataIndex="clientName"
                 key="clientName"
                 align="center"
@@ -682,14 +871,16 @@ const ManageClaim = () => {
                 key="lastModified"
                 align="center"
               />
-              <Column
-                title="Thao tác"
-                key="action"
-                align="center"
-                render={(text, row: IClaim) => {
-                  return <span>{renderIcon(row, user.role)}</span>;
-                }}
-              />
+              {!readonly && (
+                <Column
+                  title="Thao tác"
+                  key="action"
+                  align="center"
+                  render={(text, row: IClaim) => {
+                    return <span>{renderIcon(row, user.role)}</span>;
+                  }}
+                />
+              )}
             </Table>
           </Card>
           {!_.isEmpty(claim) && <DetailClaim ref={ref} claim={claim} />}
@@ -707,6 +898,14 @@ const ManageClaim = () => {
             form={formSettle}
             visible={settleVisible}
             onOk={handleSettleOK}
+            onCancel={handleCancel}
+          />
+          <AssignForm
+            claim={currentRowData}
+            confirmLoading={assignLoading}
+            form={formAssign}
+            visible={assignVisible}
+            onOk={handleAssignOK}
             onCancel={handleCancel}
           />
 

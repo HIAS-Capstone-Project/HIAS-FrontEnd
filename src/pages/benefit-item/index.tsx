@@ -9,12 +9,15 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import { useAppSelector } from 'app/hooks';
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
 import { NOT_ACCEPTABLE } from 'constants/http-status';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import _ from 'lodash';
 import { IBenefit } from 'pages/benefit/types';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import {
   addBenefitItem,
   deleteBenefitItem,
@@ -25,6 +28,7 @@ import { getAllBenefit } from 'services/benefit.service';
 import AddBenefitItemForm from './form/add-benefit-item-form';
 import EditBenefitItemForm from './form/edit-benefit-item-form';
 import { IBenefitItem, QueryParams } from './types';
+import dashboardLinks from '../../pages/links';
 const { Column } = Table;
 
 interface IBenefitItemPageState {
@@ -41,6 +45,12 @@ interface IBenefitItemPageState {
 const BenefitItemPage = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const initialState = {
     benefitItemList: [] as IBenefitItem[],
@@ -254,9 +264,11 @@ const BenefitItemPage = () => {
       style={{ justifyContent: 'space-between', width: '100%' }}
     >
       <span>
-        <Button size="large" type="primary" onClick={handleAddBenefitItem}>
-          Thêm Danh mục quyền lợi
-        </Button>
+        {!readonly && (
+          <Button size="large" type="primary" onClick={handleAddBenefitItem}>
+            Thêm Danh mục quyền lợi
+          </Button>
+        )}
       </span>
       <Input.Search
         placeholder="Nhập vào giá trị muốn tìm kiếm"
@@ -330,34 +342,36 @@ const BenefitItemPage = () => {
               `${text?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VNĐ`
             }
           />
-          <Column
-            title="Thao tác"
-            key="action"
-            align="center"
-            render={(text, row: IBenefitItem) => (
-              <span>
-                <EditTwoTone
-                  style={{ fontSize: '200%' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleEditBenefitItem(row);
-                  }}
-                />
-                <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <DeleteOutlined
-                  style={{ fontSize: '200%', color: '#ff4d4f' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    setBenefitItemPageState({
-                      ...benefitItemPageState,
-                      currentRowData: row,
-                      deleteModelVisible: true,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          />
+          {!readonly && (
+            <Column
+              title="Thao tác"
+              key="action"
+              align="center"
+              render={(text, row: IBenefitItem) => (
+                <span>
+                  <EditTwoTone
+                    style={{ fontSize: '200%' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleEditBenefitItem(row);
+                    }}
+                  />
+                  <Divider type="vertical" style={{ fontSize: '200%' }} />
+                  <DeleteOutlined
+                    style={{ fontSize: '200%', color: '#ff4d4f' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      setBenefitItemPageState({
+                        ...benefitItemPageState,
+                        currentRowData: row,
+                        deleteModelVisible: true,
+                      });
+                    }}
+                  />
+                </span>
+              )}
+            />
+          )}
         </Table>
       </Card>
       <EditBenefitItemForm

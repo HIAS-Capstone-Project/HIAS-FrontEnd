@@ -7,36 +7,51 @@ import Color from 'constants/colors';
 import NumberCard from 'components/numberCard';
 import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import { useAppSelector } from 'app/hooks';
-import { selectPermission, selectRoles } from 'features/layout/layoutSlice';
+import BussinessSector from 'components/chart/BusinessSectorChart';
+import LocationChart from 'components/chart/LocationChart';
+import ClaimByAllStatus from 'components/chart/ClaimByAllStatus';
+import ClaimBySpecialStatus from 'components/chart/ClaimBySpecialStatus';
+import { useEffect, useState } from 'react';
+import { findAll } from 'services/dashboard.service';
 
 const Dashboard = () => {
   const user = useAppSelector(selectCurrentUser);
-  const isPermission = useAppSelector(selectPermission);
+  const [number, setNumber] = useState<any>([]);
+
+  useEffect(() => {
+    findAll()
+      .then((res: any) => {
+        setNumber(res.data);
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }, []);
 
   const numbers = [
     {
       icon: 'pay-circle-o',
       color: Color.green,
-      title: 'Online Review',
-      number: 2781,
+      title: 'Member',
+      number: number[2]?.value,
     },
     {
       icon: 'team',
       color: Color.blue,
-      title: 'New Customers',
-      number: 3241,
+      title: 'Claim',
+      number: number[1]?.value,
     },
     {
       icon: 'message',
       color: Color.purple,
-      title: 'Active Projects',
-      number: 253,
+      title: 'Policy',
+      number: number[3]?.value,
     },
     {
       icon: 'shopping-cart',
       color: Color.red,
-      title: 'Referrals',
-      number: 4324,
+      title: 'Business Sectors',
+      number: number[0]?.value,
     },
   ];
 
@@ -55,13 +70,21 @@ const Dashboard = () => {
         </Row>
       </Card>
       <Card style={{ marginBottom: '24px' }}>
-        <Row>
-          <Col span={12}>
-            {isPermission && <AgePieChart role={user?.role} />}
-          </Col>
-          <Col span={12}>
-            {isPermission && <GenderBarChart role={user?.role} />}
-          </Col>
+        <Row gutter={24}>
+          <Col span={12}>{<AgePieChart role={user?.role} />}</Col>
+          <Col span={12}>{<GenderBarChart role={user?.role} />}</Col>
+        </Row>
+      </Card>
+      <Card style={{ marginBottom: '24px' }}>
+        <Row gutter={24}>
+          <Col span={12}>{<BussinessSector role={user?.role} />}</Col>
+          <Col span={12}>{<LocationChart role={user?.role} />}</Col>
+        </Row>
+      </Card>
+      <Card style={{ marginBottom: '24px' }}>
+        <Row gutter={24}>
+          <Col span={12}>{<ClaimByAllStatus role={user?.role} />}</Col>
+          <Col span={12}>{<ClaimBySpecialStatus role={user?.role} />}</Col>
         </Row>
       </Card>
     </div>

@@ -47,3 +47,10 @@ export const getEmploymentTypes = async () => {
   );
   return response.data;
 };
+
+export const findEmployeesByTypeCode = async (param: string) => {
+  const response = await httpProvider.get<IEmployee[]>(
+    `employee/find-by-employment-type-code?employmentTypeCode=${param}`,
+  );
+  return response.data;
+};

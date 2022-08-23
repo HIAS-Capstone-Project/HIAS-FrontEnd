@@ -75,8 +75,8 @@ const links: any = {
   ],
   ROLE_SERVICE_PROVIDER: [
     {
-      to: '/dashboard',
-      name: 'Dashboard',
+      to: '/home',
+      name: 'Trang chủ',
       readonly: false,
     },
     {
@@ -104,8 +104,8 @@ const links: any = {
   ],
   ROLE_MEMBER: [
     {
-      to: '/dashboard',
-      name: 'Dashboard',
+      to: '/home',
+      name: 'Trang chủ',
       readonly: false,
     },
     {

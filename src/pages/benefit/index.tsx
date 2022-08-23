@@ -9,11 +9,14 @@ import {
   Table,
   TablePaginationConfig,
 } from 'antd';
+import { useAppSelector } from 'app/hooks';
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import _ from 'lodash';
 import { IBenefitDTOS } from 'models/benefit/types';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import {
   addBenefit,
   deleteBenefit,
@@ -26,6 +29,7 @@ import { ILicense } from './../../models/license/types';
 import AddBenefitForm from './form/add-benefit-form';
 import EditBenefitForm from './form/edit-benefit-form';
 import { QueryParams } from './types';
+import dashboardLinks from '../../pages/links';
 const { Column } = Table;
 
 interface BenefitPageState {
@@ -42,6 +46,12 @@ interface BenefitPageState {
 const BenefitPage = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const initialState = {
     benefitList: [] as IBenefitDTOS[],
@@ -251,9 +261,11 @@ const BenefitPage = () => {
       style={{ justifyContent: 'space-between', width: '100%' }}
     >
       <span>
-        <Button size="large" type="primary" onClick={handleAddBenefit}>
-          Thêm Quyền lợi
-        </Button>
+        {!readonly && (
+          <Button size="large" type="primary" onClick={handleAddBenefit}>
+            Thêm Quyền lợi
+          </Button>
+        )}
       </span>
       <Input.Search
         placeholder="Nhập vào giá trị muốn tìm kiếm"
@@ -312,34 +324,36 @@ const BenefitPage = () => {
             key="benefitName"
             align="center"
           />
-          <Column
-            title="Thao tác"
-            key="action"
-            align="center"
-            render={(text, row: IBenefitDTOS) => (
-              <span>
-                <EditTwoTone
-                  style={{ fontSize: '200%' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleEditBenefit(row);
-                  }}
-                />
-                <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <DeleteOutlined
-                  style={{ fontSize: '200%', color: '#ff4d4f' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    setBenefitPageState({
-                      ...benefitPageState,
-                      currentRowData: row,
-                      deleteModelVisible: true,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          />
+          {!readonly && (
+            <Column
+              title="Thao tác"
+              key="action"
+              align="center"
+              render={(text, row: IBenefitDTOS) => (
+                <span>
+                  <EditTwoTone
+                    style={{ fontSize: '200%' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleEditBenefit(row);
+                    }}
+                  />
+                  <Divider type="vertical" style={{ fontSize: '200%' }} />
+                  <DeleteOutlined
+                    style={{ fontSize: '200%', color: '#ff4d4f' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      setBenefitPageState({
+                        ...benefitPageState,
+                        currentRowData: row,
+                        deleteModelVisible: true,
+                      });
+                    }}
+                  />
+                </span>
+              )}
+            />
+          )}
         </Table>
       </Card>
       <EditBenefitForm
