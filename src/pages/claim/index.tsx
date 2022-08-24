@@ -1,9 +1,9 @@
 import { Button, Card, Empty, Form, Result, Space, Steps } from 'antd';
-import type { UploadFile } from 'antd/es/upload/interface';
 import { ResultStatusType } from 'antd/lib/result';
 import { useAppSelector } from 'app/hooks';
 import Loading from 'components/loading';
 import { openNotificationWithIcon } from 'components/notification';
+import { storage } from 'config/firebase-config';
 import STATUS from 'constants/claim-status';
 import DateFormat from 'constants/date-format';
 import ROLE from 'constants/roles';
@@ -12,9 +12,11 @@ import {
   selectUserInfo,
 } from 'features/authentication/authenticationSlice';
 import { IUser } from 'features/authentication/types';
-import { removeTokenOnURL, uploadFiles } from 'helper';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { removeTokenOnURL } from 'helper';
 import _ from 'lodash';
 import { IBenefitDTOS } from 'models/benefit/types';
+import { IClaimSubmitRequestDTO } from 'models/claim/types';
 import { ILicense } from 'models/license/types';
 import moment from 'moment';
 import { IClaim, IClaimDocument } from 'pages/claim/types';
@@ -28,15 +30,11 @@ import {
   submitClaimByMember,
 } from 'services/claim.service';
 import { getLicensesByBenefit } from 'services/license.service';
+import { v4 } from 'uuid';
 import BenefitClaim from './benefits/index';
 import Detail from './detail';
 import Summary from './summary';
 import Term from './terms/index';
-import { storage } from 'config/firebase-config';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { v4 } from 'uuid';
-import { IClaimSubmitRequestDTO } from 'models/claim/types';
-import { Item } from 'rc-menu';
 
 const { Step } = Steps;
 
