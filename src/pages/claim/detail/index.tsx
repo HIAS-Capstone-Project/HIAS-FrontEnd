@@ -127,8 +127,8 @@ const Detail = (props: IDetailProps) => {
                       value: UploadChangeParam<UploadFile<any>>,
                     ) => {
                       if (_.isEmpty(value?.fileList)) {
-                        if (!_.isEmpty(claimDocument?.fileList))
-                          return Promise.resolve();
+                        // if (!_.isEmpty(claimDocument?.fileList))
+                        //   return Promise.resolve();
                         return Promise.reject();
                       }
                       return Promise.resolve();

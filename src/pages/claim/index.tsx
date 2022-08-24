@@ -76,16 +76,14 @@ const CreateClaimPage = () => {
         if (res) {
           if (_.isEmpty(res)) return;
           setLicenseList(res);
-          if (!params.claimNo) {
-            const newClaimDocuments = [] as IClaimDocument[];
-            res.forEach(item => {
-              newClaimDocuments.push({
-                licenseNo: item.licenseNo,
-                fileList: [],
-              });
+          const newClaimDocuments = [] as IClaimDocument[];
+          res.forEach(item => {
+            newClaimDocuments.push({
+              licenseNo: item.licenseNo,
+              fileList: [],
             });
-            setClaimDocuments(newClaimDocuments);
-          }
+          });
+          setClaimDocuments(newClaimDocuments);
         }
       })
       .finally(() => {
@@ -175,38 +173,38 @@ const CreateClaimPage = () => {
 
   const initialValue = useMemo(() => {
     if (_.isEmpty(claim)) return {};
-    const claimDocuments = claim.claimDocumentResponseDTOS;
-    const initialClaimDocument = [] as IClaimDocument[];
+    // const claimDocuments = claim.claimDocumentResponseDTOS;
+    // const initialClaimDocument = [] as IClaimDocument[];
 
-    claimDocuments.forEach(claimDocument => {
-      const index = initialClaimDocument.findIndex(
-        item => item.licenseNo === claimDocument.licenseResponseDTO.licenseNo,
-      );
-      if (index === -1) {
-        initialClaimDocument.push({
-          licenseNo: claimDocument.licenseResponseDTO.licenseNo,
-          fileList: [
-            {
-              uid: `${v4()}`,
-              name: `${claimDocument.originalFileName}`,
-              status: 'done',
-              url: `${claimDocument.fileUrl}`,
-              thumbUrl: `${claimDocument.fileUrl}`,
-            },
-          ],
-        } as IClaimDocument);
-      } else {
-        initialClaimDocument[index].fileList.push({
-          uid: `${v4()}`,
-          name: `${claimDocument.originalFileName}`,
-          status: 'done',
-          url: `${claimDocument.fileUrl}`,
-          thumbUrl: `${claimDocument.fileUrl}`,
-        });
-      }
-    });
+    // claimDocuments.forEach(claimDocument => {
+    //   const index = initialClaimDocument.findIndex(
+    //     item => item.licenseNo === claimDocument.licenseResponseDTO.licenseNo,
+    //   );
+    //   if (index === -1) {
+    //     initialClaimDocument.push({
+    //       licenseNo: claimDocument.licenseResponseDTO.licenseNo,
+    //       fileList: [
+    //         {
+    //           uid: `${v4()}`,
+    //           name: `${claimDocument.originalFileName}`,
+    //           status: 'done',
+    //           url: `${claimDocument.fileUrl}`,
+    //           thumbUrl: `${claimDocument.fileUrl}`,
+    //         },
+    //       ],
+    //     } as IClaimDocument);
+    //   } else {
+    //     initialClaimDocument[index].fileList.push({
+    //       uid: `${v4()}`,
+    //       name: `${claimDocument.originalFileName}`,
+    //       status: 'done',
+    //       url: `${claimDocument.fileUrl}`,
+    //       thumbUrl: `${claimDocument.fileUrl}`,
+    //     });
+    //   }
+    // });
 
-    setClaimDocuments(initialClaimDocument);
+    // setClaimDocuments(initialClaimDocument);
 
     const res = {
       benefitNo: claim.benefitNo,
