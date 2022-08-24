@@ -37,6 +37,7 @@ export interface IClaim {
   policyResponseDTO: IPolicy;
   recordSource: string;
   rejectReason: string;
+  returnReason: string;
   remark: string;
   serviceProviderNo: number;
   serviceProviderResponseDTO: IServiceProvider;
@@ -54,6 +55,12 @@ export interface IClaimRejectRequestDTO {
   claimNo: number;
   rejectReason: string;
   statusReasonCode: string;
+}
+
+export interface IClaimReturnRequestDTO {
+  claimNo: number;
+  returnReason: string;
+  returnReasonCode: string;
 }
 
 export interface IClaimPaymentRequestDTO {

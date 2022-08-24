@@ -11,6 +11,7 @@ const STATUS = {
   PAYMENT_PROCESSING: { key: 'PAY', value: '' },
   SETTLED: { key: 'SET', value: '' },
   REJECTED: { key: 'REJ', value: '' },
+  RETURN: { key: 'RET', value: '' },
 };
 
 export default STATUS;

@@ -4,6 +4,7 @@ import {
   ExportOutlined,
   FileDoneOutlined,
   FileExcelOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -40,16 +41,18 @@ import {
   getDetailClaim,
   medicalVerified,
   rejectClaim,
+  returnClaim,
   settleClaim,
   startProgressVerify,
   updateClaim,
 } from 'services/claim.service';
+import dashboardLinks from '../../pages/links';
 import { cancelClaim } from './../../services/claim.service';
 import DetailClaim from './DetailClaim';
 import AssignForm from './form/assign-form';
 import RejectForm from './form/reject-form';
+import ReturnForm from './form/return-form';
 import SettleForm from './form/settle-form';
-import dashboardLinks from '../../pages/links';
 
 const { Column } = Table;
 
@@ -71,6 +74,8 @@ interface IClaimPageState {
   dialogContent?: IDialog;
   assignLoading: boolean;
   assignVisible: boolean;
+  returnVisible: boolean;
+  returnLoading: boolean;
 }
 
 const ManageClaim = () => {
@@ -88,10 +93,13 @@ const ManageClaim = () => {
     settleLoading: false,
     assignLoading: false,
     assignVisible: false,
+    returnVisible: false,
+    returnLoading: false,
   };
 
   const [formSettle] = Form.useForm();
   const [formReject] = Form.useForm();
+  const [formReturn] = Form.useForm();
   const [formAssign] = Form.useForm();
   const location = useLocation();
 
@@ -130,6 +138,8 @@ const ManageClaim = () => {
     assignLoading,
     assignVisible,
     dialogContent,
+    returnLoading,
+    returnVisible,
   } = claimPageState;
   const { claimNo } = currentRowData;
 
@@ -163,6 +173,8 @@ const ManageClaim = () => {
             settleVisible: false,
             assignLoading: false,
             assignVisible: false,
+            returnVisible: false,
+            returnLoading: false,
           });
           setPagination({
             ...pagination,
@@ -202,7 +214,8 @@ const ManageClaim = () => {
       !confirmVisible &&
       !rejectVisible &&
       !settleVisible &&
-      !assignVisible
+      !assignVisible &&
+      !returnVisible
     ) {
       getClaim(claimNo);
     }
@@ -480,6 +493,7 @@ const ManageClaim = () => {
       settleVisible: false,
       confirmVisible: false,
       assignVisible: false,
+      returnVisible: false,
     });
   };
 
@@ -582,6 +596,42 @@ const ManageClaim = () => {
             'bottomLeft',
           );
           setClaimPageState({ ...claimPageState, rejectLoading: false });
+        });
+    });
+  };
+
+  const handleReturn = (claim: IClaim) => {
+    setClaimPageState({
+      ...claimPageState,
+      returnVisible: true,
+      currentRowData: { ...claim },
+    });
+  };
+
+  const handleReturnOK = () => {
+    formReturn.validateFields().then(() => {
+      const fieldValue = formReturn.getFieldsValue();
+      fieldValue.claimNo = claimNo;
+      setClaimPageState({ ...claimPageState, returnLoading: true });
+      returnClaim(fieldValue)
+        .then(res => {
+          formReturn.resetFields();
+          openNotificationWithIcon(
+            'success',
+            'Trả lại yêu cầu bồi thường thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} đã được trả lại`,
+            'bottomLeft',
+          );
+          getClaimList({ pagination });
+        })
+        .catch(() => {
+          openNotificationWithIcon(
+            'error',
+            'Trả lại yêu cầu bồi thường không thành công',
+            `Yêu cầu bồi thường có mã ${claim.claimID} chưa được trả lại`,
+            'bottomLeft',
+          );
+          setClaimPageState({ ...claimPageState, returnLoading: false });
         });
     });
   };
@@ -770,6 +820,18 @@ const ManageClaim = () => {
                 handleReject(claim);
               }}
             />
+            {role !== ROLE.ACCOUNTANT && (
+              <>
+                <Divider type="vertical" style={{ fontSize: '200%' }} />
+                <ReloadOutlined
+                  style={{ fontSize: '200%', color: '#52c41a' }}
+                  onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    handleReturn(claim);
+                  }}
+                />
+              </>
+            )}
           </>
         );
       } else {
@@ -785,7 +847,11 @@ const ManageClaim = () => {
       }
     }
 
-    if (claim.statusCode === STATUS.DRAFT.key) {
+    if (
+      claim.statusCode === STATUS.DRAFT.key ||
+      (claim.statusCode === STATUS.RETURN.key &&
+        (role === ROLE.MEMBER || role === ROLE.SERVICE_PROVIDER))
+    ) {
       return (
         <>
           <EditTwoTone
@@ -890,6 +956,14 @@ const ManageClaim = () => {
             form={formReject}
             visible={rejectVisible}
             onOk={handleRejectOK}
+            onCancel={handleCancel}
+          />
+          <ReturnForm
+            claim={currentRowData}
+            confirmLoading={returnLoading}
+            form={formReturn}
+            visible={returnVisible}
+            onOk={handleReturnOK}
             onCancel={handleCancel}
           />
           <SettleForm

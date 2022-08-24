@@ -283,6 +283,22 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
               </Col>
             )}
           </Row>
+          <Row style={{ padding: '8px 0' }} gutter={16}>
+            {claim?.rejectReason && (
+              <Col span={8}>
+                <Card type="inner" title="Lý do từ chối">
+                  {claim?.rejectReason}
+                </Card>
+              </Col>
+            )}
+            {claim?.returnReason && (
+              <Col span={8}>
+                <Card type="inner" title="Lý do trả lại">
+                  {claim?.returnReason}
+                </Card>
+              </Col>
+            )}
+          </Row>
         </Card>
       </Card>
     );

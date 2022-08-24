@@ -112,7 +112,8 @@ const CreateClaimPage = () => {
         if (res) {
           if (
             _.isEmpty(res) ||
-            res.statusCode !== STATUS.DRAFT.key ||
+            (res.statusCode !== STATUS.DRAFT.key &&
+              res.statusCode !== STATUS.RETURN.key) ||
             res.memberNo !== user.primary_key
           ) {
             await openNotificationWithIcon(
