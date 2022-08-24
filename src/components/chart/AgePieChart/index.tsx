@@ -21,7 +21,7 @@ export const options = {
     },
     title: {
       display: true,
-      text: 'Member age chart',
+      text: 'Policy usage',
     },
   },
 };

@@ -1,5 +1,5 @@
 import httpProvider from 'http/http-provider';
-import { IClaimResponse } from 'models/claim/types';
+import { IClaimResponse, IClaimSubmitRequestDTO } from 'models/claim/types';
 import {
   IClaim,
   IClaimPaymentRequestDTO,
@@ -22,12 +22,12 @@ export const getClaims = async (params: QueryParams) => {
   return response.data;
 };
 
-export const submitClaimByMember = async (param: FormData) => {
+export const submitClaimByMember = async (param: IClaimSubmitRequestDTO) => {
   const response = await httpProvider.post<any>('claim/submit', param);
   return response.data;
 };
 
-export const saveDraftClaimByMember = async (param: FormData) => {
+export const saveDraftClaimByMember = async (param: IClaimSubmitRequestDTO) => {
   const response = await httpProvider.post<any>('claim/save-draft', param);
   return response.data;
 };

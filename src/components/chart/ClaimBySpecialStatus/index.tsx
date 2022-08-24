@@ -21,7 +21,7 @@ export const options = {
     },
     title: {
       display: true,
-      text: 'Claim with status: Approve, Legal Reject, Violation',
+      text: 'Claim with status: Settle, Legal Reject, Violation',
     },
   },
 };

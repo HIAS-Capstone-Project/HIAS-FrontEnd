@@ -3,13 +3,22 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import { ResultStatusType } from 'antd/lib/result';
 import { useAppSelector } from 'app/hooks';
 import Loading from 'components/loading';
+import { openNotificationWithIcon } from 'components/notification';
 import STATUS from 'constants/claim-status';
 import DateFormat from 'constants/date-format';
-import { selectCurrentUser } from 'features/authentication/authenticationSlice';
+import ROLE from 'constants/roles';
+import {
+  selectCurrentUser,
+  selectUserInfo,
+} from 'features/authentication/authenticationSlice';
 import { IUser } from 'features/authentication/types';
+import { removeTokenOnURL, uploadFiles } from 'helper';
 import _ from 'lodash';
 import { IBenefitDTOS } from 'models/benefit/types';
 import { ILicense } from 'models/license/types';
+import moment from 'moment';
+import { IClaim, IClaimDocument } from 'pages/claim/types';
+import { IMember } from 'pages/member/types';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { getBenefitsByMember } from 'services/benefit.service';
@@ -23,12 +32,11 @@ import BenefitClaim from './benefits/index';
 import Detail from './detail';
 import Summary from './summary';
 import Term from './terms/index';
-import { IClaim } from 'pages/claim/types';
-import { openNotificationWithIcon } from 'components/notification';
-import moment from 'moment';
-import { IClaimDocumentResponseDTO } from 'models/claim/types';
-import { NOT_ACCEPTABLE } from 'constants/http-status';
-import { callbackify } from 'util';
+import { storage } from 'config/firebase-config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 } from 'uuid';
+import { IClaimSubmitRequestDTO } from 'models/claim/types';
+import { Item } from 'rc-menu';
 
 const { Step } = Steps;
 
@@ -37,6 +45,7 @@ const CreateClaimPage = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const user = useAppSelector(selectCurrentUser) as IUser;
+  const userInfo = useAppSelector(selectUserInfo) as IMember;
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(false);
   const [showResult, setShowResult] = useState<{
@@ -52,8 +61,15 @@ const CreateClaimPage = () => {
   });
   const [benefitList, setBenefitList] = useState<IBenefitDTOS[]>([]);
   const [licenseList, setLicenseList] = useState<ILicense[]>([]);
-  const [filesList, setFilesList] = useState<UploadFile<any>[][]>([]);
+  const [claimDocuments, setClaimDocuments] = useState<IClaimDocument[]>([]);
   const [claim, setClaim] = useState<IClaim>({} as IClaim);
+
+  const member = useMemo(() => {
+    if (user.role === ROLE.MEMBER) {
+      return userInfo;
+    }
+    return {} as IMember;
+  }, []);
 
   const getLicenseList = async (benefitNo: number) => {
     setLoading(true);
@@ -62,6 +78,16 @@ const CreateClaimPage = () => {
         if (res) {
           if (_.isEmpty(res)) return;
           setLicenseList(res);
+          if (!params.claimNo) {
+            const newClaimDocuments = [] as IClaimDocument[];
+            res.forEach(item => {
+              newClaimDocuments.push({
+                licenseNo: item.licenseNo,
+                fileList: [],
+              });
+            });
+            setClaimDocuments(newClaimDocuments);
+          }
         }
       })
       .finally(() => {
@@ -121,7 +147,7 @@ const CreateClaimPage = () => {
       },
       {
         title: 'Chi tiết điều trị',
-        content: <BenefitClaim benefits={benefitList} claim={claim} />,
+        content: <BenefitClaim benefits={benefitList} member={member} />,
         fields: ['benefitNo', 'medicalAddress', 'visitDate', 'claimAmount'],
         description: '',
         icon: '',
@@ -132,8 +158,8 @@ const CreateClaimPage = () => {
           <Detail
             licenses={licenseList}
             form={form}
-            filesList={filesList}
-            setFilesList={setFilesList}
+            claimDocuments={claimDocuments}
+            setClaimDocuments={setClaimDocuments}
           />
         ),
         fields: [...licenseList.map(license => license.licenseNo.toString())],
@@ -147,32 +173,42 @@ const CreateClaimPage = () => {
         icon: '',
       },
     ];
-  }, [benefitList, filesList, form, licenseList]);
+  }, [benefitList, claimDocuments, form, licenseList]);
 
   const initialValue = useMemo(() => {
     if (_.isEmpty(claim)) return {};
     const claimDocuments = claim.claimDocumentResponseDTOS;
-    const files = [] as UploadFile<any>[][];
+    const initialClaimDocument = [] as IClaimDocument[];
 
-    claimDocuments.forEach((claimDocument, index) => {
-      // form.setFields([
-      //   {
-      //     name: `${claimDocument.licenseResponseDTO.licenseNo.toString()}`,
-      //     value: new File(),
-      //   },
-      // ]);
-      files.push([
-        {
-          uid: `${index}`,
+    claimDocuments.forEach(claimDocument => {
+      const index = initialClaimDocument.findIndex(
+        item => item.licenseNo === claimDocument.licenseResponseDTO.licenseNo,
+      );
+      if (index === -1) {
+        initialClaimDocument.push({
+          licenseNo: claimDocument.licenseResponseDTO.licenseNo,
+          fileList: [
+            {
+              uid: `${v4()}`,
+              name: `${claimDocument.originalFileName}`,
+              status: 'done',
+              url: `${claimDocument.fileUrl}`,
+              thumbUrl: `${claimDocument.fileUrl}`,
+            },
+          ],
+        } as IClaimDocument);
+      } else {
+        initialClaimDocument[index].fileList.push({
+          uid: `${v4()}`,
           name: `${claimDocument.originalFileName}`,
           status: 'done',
           url: `${claimDocument.fileUrl}`,
           thumbUrl: `${claimDocument.fileUrl}`,
-        },
-      ]);
+        });
+      }
     });
 
-    setFilesList(files);
+    setClaimDocuments(initialClaimDocument);
 
     const res = {
       benefitNo: claim.benefitNo,
@@ -181,6 +217,14 @@ const CreateClaimPage = () => {
       claimAmount: claim.claimAmount,
       visitDate: moment(claim.visitDate, DateFormat.YYYYMMDDT),
     } as any;
+
+    // licenseList.forEach(license => {
+    //   res[license.licenseNo] = {
+    //     fileList: initialClaimDocument.find(
+    //       item => item.licenseNo === license.licenseNo,
+    //     )?.fileList,
+    //   };
+    // });
 
     if (
       !_.isEmpty(claim.admissionFromDate) &&
@@ -207,8 +251,8 @@ const CreateClaimPage = () => {
     }
   }, [user?.primary_key]);
 
-  const saveDraft = (formData: FormData) => {
-    saveDraftClaimByMember(formData)
+  const saveDraft = (data: IClaimSubmitRequestDTO) => {
+    saveDraftClaimByMember(data)
       .then(res => {
         setShowResult({
           status: 'success',
@@ -232,8 +276,8 @@ const CreateClaimPage = () => {
       });
   };
 
-  const save = (formData: FormData) => {
-    submitClaimByMember(formData)
+  const save = (data: IClaimSubmitRequestDTO) => {
+    submitClaimByMember(data)
       .then(res => {
         setShowResult({
           status: 'success',
@@ -284,13 +328,14 @@ const CreateClaimPage = () => {
     );
   }
 
-  const handleFinish = (callback: (formData: FormData) => void) => {
+  const handleFinish = async (
+    callback: (data: IClaimSubmitRequestDTO) => void,
+  ) => {
     setLoading(true);
     const fieldValue = form.getFieldsValue(true);
     const value = {
       ...fieldValue,
       memberNo: user.primary_key,
-      licenseNos: licenseList.map(license => license.licenseNo),
       visitDate: fieldValue.visitDate
         .format(DateFormat.DDMMYYYY)
         .concat(' 00:00:00'),
@@ -308,22 +353,43 @@ const CreateClaimPage = () => {
         .format(DateFormat.DDMMYYYY)
         .concat(' 00:00:00');
     }
-
-    const formData = new FormData();
     delete value.timeRange;
-    licenseList.forEach((license, index) => {
-      if (_.isEmpty(filesList[index][0].url)) {
-        formData.append('documents', fieldValue[license.licenseNo.toString()]);
-        delete value[license.licenseNo.toString()];
-      }
+    licenseList.forEach(license => {
+      delete value[license.licenseNo.toString()];
     });
-    formData.append(
-      'claimSubmitRequestDTO',
-      new Blob([JSON.stringify(value)], {
-        type: 'application/json',
+
+    const res = await Promise.all(
+      claimDocuments.map(async item => {
+        if (_.isEmpty(item.fileList)) return;
+        try {
+          const fileNames = [] as string[];
+          const fileUrls = await Promise.all(
+            item.fileList.map(async (file: any) => {
+              fileNames.push(file.name);
+              const fileRef = await ref(storage, `files/${v4() + file.name}`);
+              await uploadBytes(fileRef, file.originFileObj);
+              const res = await getDownloadURL(fileRef);
+              return removeTokenOnURL(res);
+            }),
+          );
+          return {
+            licenseNo: item.licenseNo,
+            fileNames,
+            fileUrls,
+          };
+        } catch (error) {
+          setShowResult({
+            status: 'error',
+            flag: true,
+            title: 'Lưu thất bại',
+            description:
+              'Xảy ra lỗi trong quá trình lưu bản nháp hồ sơ yêu cầu giải quyết quyền lợi.',
+          });
+        }
       }),
     );
-    callback(formData);
+    value.claimDocumentRequestDTOS = res;
+    callback(value);
   };
 
   return (
@@ -401,7 +467,12 @@ const CreateClaimPage = () => {
             title={showResult.title}
             subTitle={showResult.description}
             extra={[
-              <Button size="large" type="primary" key="console">
+              <Button
+                size="large"
+                type="primary"
+                key="console"
+                onClick={() => navigate('/home')}
+              >
                 Về trang chủ
               </Button>,
             ]}

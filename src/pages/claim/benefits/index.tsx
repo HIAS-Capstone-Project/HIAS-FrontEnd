@@ -12,17 +12,17 @@ import DateFormat from 'constants/date-format';
 import _ from 'lodash';
 import { IBenefitDTOS } from 'models/benefit/types';
 import moment from 'moment';
-import { IClaim } from 'pages/claim/types';
+import { IMember } from 'pages/member/types';
 
 const { Title } = Typography;
 
 interface IBenefitClaimProps {
   benefits: IBenefitDTOS[];
-  claim: IClaim;
+  member: IMember;
 }
 
 const BenefitClaim = (props: IBenefitClaimProps) => {
-  const { benefits, claim } = props;
+  const { benefits, member } = props;
   return (
     <Space>
       <Card style={{ minHeight: '70vh' }} bordered={false}>
@@ -102,10 +102,12 @@ const BenefitClaim = (props: IBenefitClaimProps) => {
                 message:
                   'Ngày khám nằm ngoài khoảng thời gian được hưởng quyền lợi.',
                 validator: (rule, value) => {
-                  if (_.isEmpty(claim)) return Promise.resolve();
+                  if (_.isEmpty(value)) return Promise.resolve();
                   if (
-                    value.isBefore(moment(claim.memberResponseDTO.startDate)) ||
-                    value.isAfter(moment(claim.memberResponseDTO.endDate))
+                    value.isBefore(
+                      moment(member.startDate, DateFormat.YYYYMMDD),
+                    ) ||
+                    value.isAfter(moment(member.endDate, DateFormat.YYYYMMDD))
                   )
                     return Promise.reject();
                   return Promise.resolve();

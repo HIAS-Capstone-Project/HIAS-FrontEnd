@@ -1,5 +1,5 @@
 import { ILicense } from 'models/license/types';
-import { IClaim } from 'pages/claim/types';
+import { IClaim, IClaimDocumentRequestDTO } from 'pages/claim/types';
 
 export interface IClaimDocumentResponseDTO {
   claimDocumentNo: number;
@@ -30,6 +30,6 @@ export interface IClaimSubmitRequestDTO {
   description: string;
   medicalAddress: string;
   memberNo: number;
-  licenseNos: number[];
   serviceProviderNo: number;
+  claimDocumentRequestDTOS: IClaimDocumentRequestDTO[];
 }

@@ -1,4 +1,4 @@
-import { FormInstance, TablePaginationConfig } from 'antd';
+import { FormInstance, TablePaginationConfig, UploadFile } from 'antd';
 import { IBenefitDTOS } from 'models/benefit/types';
 import { IClaimDocumentResponseDTO } from 'models/claim/types';
 import { IClient } from 'pages/client/types';
@@ -77,4 +77,15 @@ export interface FormProps {
   onOk: () => void;
   confirmLoading: boolean;
   form: FormInstance;
+}
+
+export interface IClaimDocument {
+  licenseNo: number;
+  fileList: UploadFile<any>[];
+}
+
+export interface IClaimDocumentRequestDTO {
+  licenseNo: number;
+  fileNames: string[];
+  fileUrls: string[];
 }

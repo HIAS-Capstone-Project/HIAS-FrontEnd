@@ -1,5 +1,6 @@
 import { Card, Col, List, Row, Typography } from 'antd';
 import DateFormat from 'constants/date-format';
+import _ from 'lodash';
 import moment from 'moment';
 import { IClaim } from 'pages/claim/types';
 import React, { useMemo } from 'react';
@@ -16,12 +17,27 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
     const { claim } = props;
 
     const licenseList = useMemo(() => {
-      return claim?.claimDocumentResponseDTOS.map(claimDocument => {
-        return {
-          title: claimDocument.licenseResponseDTO.label,
-          content: claimDocument.originalFileName,
-          src: claimDocument.fileUrl,
-        };
+      if (_.isEmpty(claim?.claimDocumentResponseDTOS)) return [];
+      const licenseNos = [] as number[];
+      claim.claimDocumentResponseDTOS.forEach(item => {
+        if (!licenseNos.includes(item.licenseResponseDTO.licenseNo)) {
+          licenseNos.push(item.licenseResponseDTO.licenseNo);
+        }
+      });
+      return licenseNos.map(licenseNo => {
+        const listDocument = claim.claimDocumentResponseDTOS.filter(
+          item => item.licenseResponseDTO.licenseNo === licenseNo,
+        );
+        if (_.isEmpty(listDocument)) {
+          return {};
+        } else {
+          return {
+            title: listDocument[0].licenseResponseDTO.label,
+            list: listDocument.map(item => {
+              return { content: item.originalFileName, src: item.fileUrl };
+            }),
+          };
+        }
       });
     }, [claim]);
     return (
@@ -178,31 +194,42 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
             </Col>
           </Row>
 
-          <Row style={{ paddingTop: '8px' }} gutter={16}>
-            <Col span={24}>
-              <List
-                grid={{
-                  gutter: 16,
-                  xs: 6,
-                  sm: 6,
-                  md: 4,
-                  lg: 2,
-                  xl: 2,
-                  xxl: 2,
-                }}
-                dataSource={licenseList}
-                renderItem={item => (
-                  <List.Item>
-                    <Card title={item.title}>
-                      <a href={`${item.src}`} target="_blank" rel="noreferrer">
-                        {item.content}
-                      </a>
-                    </Card>
-                  </List.Item>
-                )}
-              />
-            </Col>
-          </Row>
+          {!_.isEmpty(licenseList) && (
+            <Row style={{ paddingTop: '8px' }} gutter={16}>
+              <Col span={24}>
+                <List
+                  grid={{
+                    gutter: 16,
+                    xs: 6,
+                    sm: 6,
+                    md: 4,
+                    lg: 2,
+                    xl: 2,
+                    xxl: 2,
+                  }}
+                  dataSource={licenseList}
+                  renderItem={item => (
+                    <List.Item>
+                      <Card title={item.title}>
+                        {item.list?.map((itemList, index) => (
+                          <p key={index}>
+                            <a
+                              key={index}
+                              href={`${itemList.src}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {itemList.content}
+                            </a>
+                          </p>
+                        ))}
+                      </Card>
+                    </List.Item>
+                  )}
+                />
+              </Col>
+            </Row>
+          )}
 
           <Row style={{ padding: '8px 0' }} gutter={16}>
             {claim?.businessAppraisal && (
