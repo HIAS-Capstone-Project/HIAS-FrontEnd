@@ -1,4 +1,6 @@
+import { IFilter } from 'components/chart/PaymentChart/types';
 import httpProvider from 'http/http-provider';
+import queryString from 'query-string';
 
 export const chartAge = async () => {
   const response = await httpProvider.get<any>('chart/member-by-age');
@@ -45,9 +47,9 @@ export const findAll = async () => {
   return response;
 };
 
-export const paymentChart = async (clientNo: string) => {
+export const paymentChart = async (params?: IFilter) => {
   const response = await httpProvider.get<any>(
-    `chart/payment?clientNo=${clientNo}`,
+    `chart/payment?${queryString.stringify({ ...params })}`,
   );
-  return response;
+  return response.data;
 };
