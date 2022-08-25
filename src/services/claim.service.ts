@@ -11,11 +11,13 @@ import queryString from 'query-string';
 import { IClaimRejectRequestDTO } from './../pages/claim/types';
 
 export const getClaims = async (params: QueryParams) => {
-  const { pagination, key } = params;
+  const { pagination, key, filter } = params;
   const query = {
     searchValue: key,
     page: pagination?.current ? pagination?.current - 1 : 0,
     size: pagination?.pageSize,
+    statusCode: filter?.statusCode,
+    clientNo: filter?.clientNo,
   };
   const response = await httpProvider.get<IClaimResponse>(
     `claim/search?${queryString.stringify({ ...query })}`,

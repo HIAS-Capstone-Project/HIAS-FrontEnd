@@ -30,7 +30,8 @@ import { selectLayout, showLoading } from 'features/layout/layoutSlice';
 import { isVerifyingStatus } from 'helper';
 import _ from 'lodash';
 import moment from 'moment';
-import { IClaim, QueryParams } from 'pages/claim/types';
+import { IClaim, IFilter, QueryParams } from 'pages/claim/types';
+import { IClient } from 'pages/client/types';
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router-dom';
@@ -46,6 +47,7 @@ import {
   startProgressVerify,
   updateClaim,
 } from 'services/claim.service';
+import { getAllClient } from 'services/client.service';
 import dashboardLinks from '../../pages/links';
 import { cancelClaim } from './../../services/claim.service';
 import DetailClaim from './DetailClaim';
@@ -77,6 +79,17 @@ interface IClaimPageState {
   returnVisible: boolean;
   returnLoading: boolean;
 }
+
+const option = [
+  { value: STATUS.DRAFT.key, name: 'DRAFT' },
+  { value: STATUS.SUBMITTED.key, name: 'SUBMITTED' },
+  { value: STATUS.BUSINESS_VERIFIED.key, name: 'BUSINESS_VERIFIED' },
+  { value: STATUS.MEDICAL_VERIFIED.key, name: 'MEDICAL_VERIFIED' },
+  { value: STATUS.APPROVED.key, name: 'APPROVED' },
+  { value: STATUS.SETTLED.key, name: 'SETTLED' },
+  { value: STATUS.REJECTED.key, name: 'REJECTED' },
+  { value: STATUS.RETURN.key, name: 'RETURN' },
+];
 
 const ManageClaim = () => {
   const dispatch = useAppDispatch();
@@ -126,6 +139,8 @@ const ManageClaim = () => {
 
   const [key, setKey] = useState<string>('');
   const [claim, setClaim] = useState<IClaim>({} as IClaim);
+  const [clients, setClients] = useState<IClient[]>([]);
+  const [filter, setFilter] = useState<IFilter>({} as IFilter);
 
   const {
     claimList,
@@ -208,6 +223,20 @@ const ManageClaim = () => {
       });
   };
 
+  const getClientList = async () => {
+    dispatch(showLoading(true));
+    getAllClient()
+      .then(res => {
+        if (res) {
+          if (_.isEmpty(res)) return;
+          setClients(res);
+        }
+      })
+      .finally(() => {
+        dispatch(showLoading(false));
+      });
+  };
+
   useEffect(() => {
     if (
       claimNo &&
@@ -222,7 +251,8 @@ const ManageClaim = () => {
   }, [claimNo]);
 
   useEffect(() => {
-    getClaimList({ pagination });
+    getClaimList({ pagination, filter });
+    getClientList();
   }, []);
 
   useEffect(() => {
@@ -236,6 +266,13 @@ const ManageClaim = () => {
     setClaim({} as IClaim);
     getClaimList({ pagination, key: value });
   };
+
+  const optionStatusCode = useMemo(() => {
+    if (![ROLE.MEMBER, ROLE.SERVICE_PROVIDER].includes(user.role)) {
+      return option.filter(item => item.value !== STATUS.DRAFT.key);
+    }
+    return option;
+  }, [user.role]);
 
   const title = (
     <Space
@@ -256,6 +293,16 @@ const ManageClaim = () => {
           </Button>
         )}
         <Select
+          defaultValue={filter.clientNo}
+          allowClear
+          onChange={(value: number) => {
+            getClaimList({
+              pagination,
+              filter: { ...filter, clientNo: value },
+            });
+            setFilter({ ...filter, clientNo: value });
+            setClaim({} as IClaim);
+          }}
           showSearch
           size="large"
           placeholder="Chọn doanh nghiệp"
@@ -271,15 +318,25 @@ const ManageClaim = () => {
               )
           }
         >
-          {/* {benefits.map(benefit => {
+          {clients.map(client => {
             return (
-              <Select.Option key={benefit.benefitNo} value={benefit.benefitNo}>
-                {benefit.benefitName}
+              <Select.Option key={client.clientNo} value={client.clientNo}>
+                {client.clientName}
               </Select.Option>
             );
-          })} */}
+          })}
         </Select>
         <Select
+          defaultValue={filter.statusCode}
+          allowClear
+          onChange={(value: string) => {
+            getClaimList({
+              pagination,
+              filter: { ...filter, statusCode: value },
+            });
+            setFilter({ ...filter, statusCode: value });
+            setClaim({} as IClaim);
+          }}
           showSearch
           size="large"
           placeholder="Chọn trạng thái"
@@ -295,13 +352,13 @@ const ManageClaim = () => {
               )
           }
         >
-          {/* {benefits.map(benefit => {
+          {optionStatusCode.map(statusCode => {
             return (
-              <Select.Option key={benefit.benefitNo} value={benefit.benefitNo}>
-                {benefit.benefitName}
+              <Select.Option key={statusCode.value} value={statusCode.value}>
+                {statusCode.name}
               </Select.Option>
             );
-          })} */}
+          })}
         </Select>
       </Space>
       <Input.Search
@@ -316,7 +373,7 @@ const ManageClaim = () => {
   );
 
   const handleTableChange = (newPagination: TablePaginationConfig) => {
-    getClaimList({ pagination: newPagination, key });
+    getClaimList({ pagination: newPagination, key, filter });
   };
 
   const startProgress = async (claim: IClaim) => {
@@ -331,7 +388,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã được chuyển trạng thái`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         }
       })
       .catch(() => {
@@ -364,7 +421,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã bị hủy`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         }
       })
       .catch(() => {
@@ -397,7 +454,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã được chuyển trạng thái`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         }
       })
       .catch(() => {
@@ -430,7 +487,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã được chuyển trạng thái`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         }
       })
       .catch(() => {
@@ -463,7 +520,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã được chuyển trạng thái`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         }
       })
       .catch(() => {
@@ -586,7 +643,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã bị từ chối`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         })
         .catch(() => {
           openNotificationWithIcon(
@@ -622,7 +679,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã được trả lại`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         })
         .catch(() => {
           openNotificationWithIcon(
@@ -658,7 +715,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã được thanh toán`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         })
         .catch(() => {
           openNotificationWithIcon(
@@ -714,7 +771,7 @@ const ManageClaim = () => {
             `Yêu cầu bồi thường có mã ${claim.claimID} đã được chỉnh sửa người tham gia kiểm duyệt/thanh toán`,
             'bottomLeft',
           );
-          getClaimList({ pagination });
+          getClaimList({ pagination, filter, key });
         })
         .catch(() => {
           openNotificationWithIcon(
