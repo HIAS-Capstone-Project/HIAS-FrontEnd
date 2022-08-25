@@ -423,6 +423,7 @@ const EmployeePage = () => {
         </Table>
       </Card>
       <EditEmployeeForm
+        readonly={readonly}
         departments={departments}
         viewMode={viewMode}
         currentRowData={currentRowData}

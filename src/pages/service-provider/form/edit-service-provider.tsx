@@ -13,6 +13,7 @@ const EditServiceProviderForm = (props: UpdateFormProps) => {
     confirmLoading,
     currentRowData,
     viewMode,
+    readonly,
   } = props;
   const {
     serviceProviderID,
@@ -40,6 +41,11 @@ const EditServiceProviderForm = (props: UpdateFormProps) => {
     form.setFieldsValue(initialValues);
   }, [form, initialValues]);
 
+  const propsModal = useMemo(() => {
+    if (readonly) return { footer: null };
+    else return {};
+  }, [readonly]);
+
   return (
     <Modal
       title={
@@ -47,6 +53,7 @@ const EditServiceProviderForm = (props: UpdateFormProps) => {
           ? 'Thông tin cơ sở khám chữa bệnh'
           : 'Chỉnh sửa cơ sở khám chữa bệnh'
       }
+      {...propsModal}
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

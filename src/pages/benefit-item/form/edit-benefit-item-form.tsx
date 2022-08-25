@@ -1,5 +1,5 @@
 import { Form, Input, InputNumber, Modal, Select } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { UpdateFormProps } from '../types';
 
 const EditBenefitItemForm = (props: UpdateFormProps) => {
@@ -12,12 +12,18 @@ const EditBenefitItemForm = (props: UpdateFormProps) => {
     currentRowData,
     viewMode,
     benefits,
+    readonly,
   } = props;
 
   useEffect(() => {
     form.setFieldsValue(currentRowData);
   }, [form, currentRowData]);
   const { benefitItemNo } = currentRowData;
+
+  const propsModal = useMemo(() => {
+    if (readonly) return { footer: null };
+    else return {};
+  }, [readonly]);
 
   return (
     <Modal
@@ -27,6 +33,7 @@ const EditBenefitItemForm = (props: UpdateFormProps) => {
           ? 'Thông tin danh mục quyền lợi'
           : 'Chỉnh sửa danh mục quyền lợi'
       }
+      {...propsModal}
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

@@ -382,6 +382,7 @@ const PolicyPage = () => {
         </Table>
       </Card>
       <EditPolicyForm
+        readonly={readonly}
         benefits={benefits}
         clients={clients}
         viewMode={viewMode}

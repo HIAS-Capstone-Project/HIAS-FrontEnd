@@ -22,6 +22,7 @@ export interface FormProps {
 }
 
 export interface UpdateFormProps {
+  readonly: boolean;
   benefits: IBenefit[];
   clients: IClient[];
   viewMode: boolean;

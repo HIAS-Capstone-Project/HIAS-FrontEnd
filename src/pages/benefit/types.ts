@@ -19,6 +19,7 @@ export interface FormProps {
 }
 
 export interface UpdateFormProps {
+  readonly: boolean;
   licenses: ILicense[];
   viewMode: boolean;
   visible: boolean;

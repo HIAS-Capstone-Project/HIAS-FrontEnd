@@ -16,6 +16,7 @@ const EditEmployeeForm = (props: UpdateFormProps) => {
     departments,
     currentRowData,
     viewMode,
+    readonly,
   } = props;
 
   const { employeeID, departmentNo, dob } = currentRowData;
@@ -42,10 +43,15 @@ const EditEmployeeForm = (props: UpdateFormProps) => {
       setEmploymentTypes(options?.list || []);
     }
   }, [options]);
+  const propsModal = useMemo(() => {
+    if (readonly) return { footer: null };
+    else return {};
+  }, [readonly]);
 
   return (
     <Modal
       title={viewMode ? 'Thông tin nhân viên' : 'Chỉnh sửa nhân viên'}
+      {...propsModal}
       visible={visible}
       onCancel={() => {
         onCancel();

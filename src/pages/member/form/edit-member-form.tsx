@@ -20,6 +20,7 @@ const EditMemberForm = (props: UpdateFormProps) => {
     provinces,
     currentRowData,
     viewMode,
+    readonly,
   } = props;
 
   const { staffID, dob, startDate, endDate, districtNo, address, clientNo } =
@@ -83,10 +84,16 @@ const EditMemberForm = (props: UpdateFormProps) => {
     form.setFieldsValue(initialValues);
   }, [form, initialValues]);
 
+  const propsModal = useMemo(() => {
+    if (readonly) return { footer: null };
+    else return {};
+  }, [readonly]);
+
   return (
     <Modal
       width={800}
       title={viewMode ? 'Thông tin thành viên' : 'Chỉnh sửa thành viên'}
+      {...propsModal}
       visible={visible}
       onCancel={() => {
         onCancel();

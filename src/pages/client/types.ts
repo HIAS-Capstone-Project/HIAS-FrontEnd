@@ -30,6 +30,7 @@ export interface FormProps {
 }
 
 export interface UpdateFormProps {
+  readonly: boolean;
   viewMode: boolean;
   visible: boolean;
   onCancel: () => void;

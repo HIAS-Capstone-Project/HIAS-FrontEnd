@@ -16,6 +16,7 @@ const EditClientForm = (props: UpdateFormProps) => {
     viewMode,
     businessSectors,
     businessEmployees,
+    readonly,
   } = props;
 
   const options = businessSectors.map(businessSector => {
@@ -39,9 +40,15 @@ const EditClientForm = (props: UpdateFormProps) => {
   }, [form, currentRowData]);
   const { corporateID } = currentRowData;
 
+  const propsModal = useMemo(() => {
+    if (readonly) return { footer: null };
+    else return {};
+  }, [readonly]);
+
   return (
     <Modal
       title={viewMode ? 'Thông tin doanh nghiệp' : 'Chỉnh sửa doanh nghiệp'}
+      {...propsModal}
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

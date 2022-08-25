@@ -1,5 +1,5 @@
 import { Checkbox, Form, Input, Modal } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { UpdateFormProps } from '../types';
 
 const EditBenefitForm = (props: UpdateFormProps) => {
@@ -12,6 +12,7 @@ const EditBenefitForm = (props: UpdateFormProps) => {
     currentRowData,
     viewMode,
     licenses,
+    readonly,
   } = props;
 
   const options = licenses.map(license => {
@@ -26,9 +27,15 @@ const EditBenefitForm = (props: UpdateFormProps) => {
   }, [form, currentRowData]);
   const { benefitNo } = currentRowData;
 
+  const propsModal = useMemo(() => {
+    if (readonly) return { footer: null };
+    else return {};
+  }, [readonly]);
+
   return (
     <Modal
       title={viewMode ? 'Thông tin quyền lợi' : 'Chỉnh sửa quyền lợi'}
+      {...propsModal}
       visible={visible}
       onCancel={onCancel}
       onOk={onOk}

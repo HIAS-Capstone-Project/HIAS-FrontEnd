@@ -51,6 +51,7 @@ export interface FormProps {
 }
 
 export interface UpdateFormProps {
+  readonly: boolean;
   provinces: IProvince[];
   clients: IClient[];
   policies: IPolicy[];

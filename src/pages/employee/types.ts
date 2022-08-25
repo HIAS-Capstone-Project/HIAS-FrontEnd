@@ -35,6 +35,7 @@ export interface FormProps {
 }
 
 export interface UpdateFormProps {
+  readonly: boolean;
   departments: IDepartment[];
   viewMode: boolean;
   visible: boolean;

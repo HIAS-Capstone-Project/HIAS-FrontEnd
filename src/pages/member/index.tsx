@@ -425,6 +425,7 @@ const MemberPage = () => {
         </Table>
       </Card>
       <EditMemberForm
+        readonly={readonly}
         provinces={provinces}
         banks={banks}
         clients={clients}

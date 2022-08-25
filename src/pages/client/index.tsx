@@ -27,6 +27,10 @@ import { NOT_ACCEPTABLE } from './../../constants';
 import AddClientForm from './forms/add-client-form';
 import EditClientForm from './forms/edit-client-form';
 import { IBusinessSector, IClient, QueryParams } from './types';
+import dashboardLinks from 'pages/links';
+import { useAppSelector } from 'app/hooks';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
+import { useLocation } from 'react-router';
 const { Column } = Table;
 
 interface ClientPageState {
@@ -43,6 +47,12 @@ interface ClientPageState {
 const ClientPage = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  const readonly = dashboardLinks[user.role].find((x: any) => {
+    return x.to == location.pathname;
+  }).readonly;
 
   const initialState = {
     clientList: [] as IClient[],
@@ -353,6 +363,7 @@ const ClientPage = () => {
         </Table>
       </Card>
       <EditClientForm
+        readonly={readonly}
         viewMode={viewMode}
         currentRowData={currentRowData}
         form={formEdit}

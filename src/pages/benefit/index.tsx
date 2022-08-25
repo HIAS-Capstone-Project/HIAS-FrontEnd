@@ -357,6 +357,7 @@ const BenefitPage = () => {
         </Table>
       </Card>
       <EditBenefitForm
+        readonly={readonly}
         licenses={licenses}
         viewMode={viewMode}
         currentRowData={currentRowData}

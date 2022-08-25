@@ -287,7 +287,11 @@ const ManageClaim = () => {
           <Button
             size="large"
             type="primary"
-            // onClick={}
+            onClick={() => {
+              if ([ROLE.MEMBER, ROLE.SERVICE_PROVIDER].includes(user.role)) {
+                navigate('/create-claim');
+              }
+            }}
           >
             Thêm Yêu cầu bồi thường
           </Button>

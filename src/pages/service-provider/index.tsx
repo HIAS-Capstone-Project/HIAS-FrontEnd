@@ -364,6 +364,7 @@ const ServiceProviderPage = () => {
         </Table>
       </Card>
       <EditServiceProviderForm
+        readonly={readonly}
         viewMode={viewMode}
         currentRowData={currentRowData}
         form={formEdit}
