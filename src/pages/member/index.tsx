@@ -78,9 +78,9 @@ const MemberPage = () => {
     showQuickJumper: true,
     showLessItems: true,
     current: 1,
-    pageSize: 5,
+    pageSize: 10,
     position: ['bottomCenter'],
-    pageSizeOptions: [5, 10, 20],
+    pageSizeOptions: [10, 20, 50],
     onShowSizeChange(current, size) {
       setPagination({ ...pagination, pageSize: size, current: 1 });
     },

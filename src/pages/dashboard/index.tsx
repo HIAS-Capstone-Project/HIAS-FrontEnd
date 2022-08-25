@@ -13,6 +13,8 @@ import ClaimByAllStatus from 'components/chart/ClaimByAllStatus';
 import ClaimBySpecialStatus from 'components/chart/ClaimBySpecialStatus';
 import { useEffect, useState } from 'react';
 import { findAll } from 'services/dashboard.service';
+import PaymentChart from 'components/chart/PaymentChart';
+import ClientNo from 'components/clientNo';
 
 const Dashboard = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -64,11 +66,8 @@ const Dashboard = () => {
   return (
     <div className="app-container">
       <Row gutter={24}>{numberCards}</Row>
-      <Card style={{ marginBottom: '24px' }}>
-        <Row gutter={24}>
-          <Col span={24}>{<MembersLineChart role={user?.role} />}</Col>
-        </Row>
-      </Card>
+      <Col span={24}>{<PaymentChart role={user?.role} />}</Col>
+      <Col span={24}>{<MembersLineChart role={user?.role} />}</Col>
       <Card style={{ marginBottom: '24px' }}>
         <Row gutter={24}>
           <Col span={12}>{<AgePieChart role={user?.role} />}</Col>

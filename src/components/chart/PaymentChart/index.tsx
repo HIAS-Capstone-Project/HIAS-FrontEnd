@@ -3,35 +3,34 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
+import { chartGender, paymentChart } from 'services/dashboard.service';
 import randomColor from 'randomcolor';
-const color = randomColor();
-import { chartOnboardYear } from 'services/dashboard.service';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import {
+  selectClient,
   selectRoles,
   setPermissions,
-  setRoles,
 } from 'features/layout/layoutSlice';
 import { Card, Col, Row } from 'antd';
+import ClientNo from 'components/clientNo';
+const color = randomColor();
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
 );
 
-const options = {
+export const options = {
   responsive: true,
   plugins: {
     legend: {
@@ -39,26 +38,25 @@ const options = {
     },
     title: {
       display: true,
-      text: 'All members',
+      text: 'Payment statistics',
     },
   },
 };
 
-interface MembersLineChartIF {
+interface PaymentChartIF {
   role: string | undefined;
 }
 
-const MembersLineChart = ({ role }: MembersLineChartIF) => {
-  const [res, setRes] = useState<any>([]);
-  const labels: any = [];
+const PaymentChart = ({ role }: PaymentChartIF) => {
+  const [res, setRes] = useState([]);
+  const client = useAppSelector(selectClient);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    chartOnboardYear().then((response: any) => {
-      setRes(response.data.lines);
-      dispatch(setRoles(response.data?.roles));
-    });
-  }, []);
+    paymentChart(client).then((response: any) =>
+      setRes(response.data.statistics),
+    );
+  }, [client]);
 
   const roles = useAppSelector(selectRoles);
 
@@ -68,29 +66,33 @@ const MembersLineChart = ({ role }: MembersLineChartIF) => {
     return <></>;
   }
 
-  const dataCharts = res.map((e: any, i: number) => {
-    e.statistics.forEach((statistic: any) => labels.push(statistic.key));
+  const mappingData = res.map((e: any) => {
     return {
-      label: e.chartName,
-      data: e.statistics.map((value: any) => value.value),
-      borderColor: color,
-      backgroundColor: color,
+      label: e?.key,
+      data: [e?.value],
+      backgroundColor: res.map(() => {
+        const color = randomColor();
+        return color;
+      }),
     };
   });
 
   const data = {
-    labels,
-    datasets: dataCharts,
+    labels: ['Payment'],
+    datasets: mappingData,
   };
   return (
     <Card style={{ marginBottom: '24px' }}>
       <Row gutter={24}>
+        <Col span={5}>
+          <ClientNo />
+        </Col>
         <Col span={24}>
-          {<Line options={options} data={data} style={{ maxHeight: 500 }} />}
+          <Bar options={options} data={data} style={{ maxHeight: 500 }} />
         </Col>
       </Row>
     </Card>
   );
 };
 
-export default MembersLineChart;
+export default PaymentChart;

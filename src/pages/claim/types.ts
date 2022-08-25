@@ -49,6 +49,7 @@ export interface IClaim {
 export interface QueryParams {
   pagination?: TablePaginationConfig;
   key?: string;
+  filter?: IFilter;
 }
 
 export interface IClaimRejectRequestDTO {
@@ -84,6 +85,11 @@ export interface FormProps {
   onOk: () => void;
   confirmLoading: boolean;
   form: FormInstance;
+}
+
+export interface IFilter {
+  clientNo: number;
+  statusCode: string;
 }
 
 export interface IClaimDocument {

@@ -1,7 +1,9 @@
-import { Checkbox, Form, Input, Modal } from 'antd';
-import { useEffect } from 'react';
+import { Checkbox, Form, Input, Modal, Select } from 'antd';
+import { useEffect, useMemo } from 'react';
 import { isVietnamesePhoneNumber } from 'utils';
 import { UpdateFormProps } from '../types';
+
+const { Option } = Select;
 
 const EditClientForm = (props: UpdateFormProps) => {
   const {
@@ -13,6 +15,7 @@ const EditClientForm = (props: UpdateFormProps) => {
     currentRowData,
     viewMode,
     businessSectors,
+    businessEmployees,
   } = props;
 
   const options = businessSectors.map(businessSector => {
@@ -21,6 +24,15 @@ const EditClientForm = (props: UpdateFormProps) => {
       value: businessSector.businessSectorNo,
     };
   });
+
+  const initialValues = useMemo(() => {
+    return {
+      ...currentRowData,
+      employeeNos: currentRowData.employeeResponseDTOS?.map(
+        item => item.employeeNo,
+      ),
+    };
+  }, [currentRowData.clientNo]);
 
   useEffect(() => {
     form.setFieldsValue(currentRowData);
@@ -43,7 +55,7 @@ const EditClientForm = (props: UpdateFormProps) => {
         form={form}
         layout="vertical"
         disabled={viewMode}
-        initialValues={currentRowData}
+        initialValues={initialValues}
       >
         <Form.Item
           name="corporateID"
@@ -82,6 +94,32 @@ const EditClientForm = (props: UpdateFormProps) => {
           ]}
         >
           <Checkbox.Group options={options} />
+        </Form.Item>
+
+        <Form.Item
+          name="employeeNos"
+          label="Chọn các nhân viên kinh doanh:"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy chọn ít nhất một nhân viên kinh doanh',
+            },
+          ]}
+        >
+          <Select
+            mode="multiple"
+            // style={{ width: '100%' }}
+            placeholder="Hãy chọn nhân viên kinh doanh làm việc với doanh nghiệp"
+            size="large"
+          >
+            {businessEmployees.map(item => {
+              return (
+                <Option key={item.employeeNo} value={item.employeeNo}>
+                  {item.employeeName}
+                </Option>
+              );
+            })}
+          </Select>
         </Form.Item>
 
         <Form.Item

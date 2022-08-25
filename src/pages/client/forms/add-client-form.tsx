@@ -1,10 +1,19 @@
-import { Checkbox, Form, Input, Modal } from 'antd';
+import { Checkbox, Form, Input, Modal, Select } from 'antd';
 import { isVietnamesePhoneNumber } from 'utils';
 import { FormProps } from '../types';
 
+const { Option } = Select;
+
 const AddClientForm = (props: FormProps) => {
-  const { form, visible, onCancel, onOk, confirmLoading, businessSectors } =
-    props;
+  const {
+    form,
+    visible,
+    onCancel,
+    onOk,
+    confirmLoading,
+    businessSectors,
+    businessEmployees,
+  } = props;
 
   const options = businessSectors.map(businessSector => {
     return {
@@ -61,6 +70,32 @@ const AddClientForm = (props: FormProps) => {
           ]}
         >
           <Checkbox.Group options={options} />
+        </Form.Item>
+
+        <Form.Item
+          name="employeeNos"
+          label="Chọn các nhân viên kinh doanh:"
+          rules={[
+            {
+              required: true,
+              message: 'Hãy chọn ít nhất một nhân viên kinh doanh',
+            },
+          ]}
+        >
+          <Select
+            mode="multiple"
+            // style={{ width: '100%' }}
+            placeholder="Hãy chọn nhân viên kinh doanh làm việc với doanh nghiệp"
+            size="large"
+          >
+            {businessEmployees.map(item => {
+              return (
+                <Option key={item.employeeNo} value={item.employeeNo}>
+                  {item.employeeName}
+                </Option>
+              );
+            })}
+          </Select>
         </Form.Item>
 
         <Form.Item

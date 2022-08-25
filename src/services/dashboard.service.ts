@@ -44,3 +44,10 @@ export const findAll = async () => {
   const response = await httpProvider.get<any>('chart/find-all');
   return response;
 };
+
+export const paymentChart = async (clientNo: string) => {
+  const response = await httpProvider.get<any>(
+    `chart/payment?clientNo=${clientNo}`,
+  );
+  return response;
+};

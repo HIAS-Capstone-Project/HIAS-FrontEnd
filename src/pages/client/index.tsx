@@ -11,7 +11,9 @@ import {
 } from 'antd';
 import ConfirmDialog from 'components/confirm-dialog';
 import { openNotificationWithIcon } from 'components/notification';
+import EMPLOYMENT_TYPE_CODE from 'constants/employee-type';
 import _ from 'lodash';
+import { IEmployee } from 'pages/employee/types';
 import { MouseEvent, useEffect, useState } from 'react';
 import { getBusinessSectors } from 'services/business.sector';
 import {
@@ -20,6 +22,7 @@ import {
   getClients,
   updateClient,
 } from 'services/client.service';
+import { findEmployeesByTypeCode } from 'services/employee.service';
 import { NOT_ACCEPTABLE } from './../../constants';
 import AddClientForm from './forms/add-client-form';
 import EditClientForm from './forms/edit-client-form';
@@ -70,6 +73,7 @@ const ClientPage = () => {
 
   const [key, setKey] = useState<string>('');
   const [businessSectors, setBusinessSectors] = useState<IBusinessSector[]>([]);
+  const [businessEmployees, setBusinessEmployees] = useState<IEmployee[]>([]);
 
   const {
     clientList,
@@ -119,9 +123,19 @@ const ClientPage = () => {
     });
   };
 
+  const getBusinessEmployeeList = async () => {
+    findEmployeesByTypeCode(EMPLOYMENT_TYPE_CODE.BE.key).then(res => {
+      if (res) {
+        if (_.isEmpty(res)) return;
+        setBusinessEmployees(res);
+      }
+    });
+  };
+
   useEffect(() => {
     getClientList({ pagination });
     getBusinessSectorList();
+    getBusinessEmployeeList();
   }, []);
 
   const handleAddClient = () => {
@@ -203,6 +217,7 @@ const ClientPage = () => {
         getClientList({ pagination });
       });
       formEdit.resetFields();
+      setClientPageState({ ...clientPageState, currentRowData: {} as IClient });
     });
   };
 
@@ -346,6 +361,7 @@ const ClientPage = () => {
         onCancel={handleCancel}
         onOk={handleEditClientOK}
         businessSectors={businessSectors}
+        businessEmployees={businessEmployees}
       />
       <AddClientForm
         form={formAdd}
@@ -354,6 +370,7 @@ const ClientPage = () => {
         onCancel={handleCancel}
         onOk={handleAddClientOK}
         businessSectors={businessSectors}
+        businessEmployees={businessEmployees}
       />
       <ConfirmDialog
         visible={deleteModelVisible}
