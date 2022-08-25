@@ -1,4 +1,5 @@
 import { Card, Col, List, Row, Typography } from 'antd';
+import { STATUS_LIST } from 'constants/claim-status';
 import DateFormat from 'constants/date-format';
 import _ from 'lodash';
 import moment from 'moment';
@@ -56,7 +57,10 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
           title={<Title level={4}>Trạng thái</Title>}
           // extra={<a href="#"></a>}
         >
-          {claim?.statusCode}
+          {
+            STATUS_LIST.find((item: any) => item.key === claim.statusCode)
+              ?.value
+          }
         </Card>
         <Card
           bodyStyle={{

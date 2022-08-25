@@ -32,12 +32,14 @@ import _ from 'lodash';
 import moment from 'moment';
 import { IClaim, IFilter, QueryParams } from 'pages/claim/types';
 import { IClient } from 'pages/client/types';
+import dashboardLinks from 'pages/links';
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import {
   approveClaim,
   businessVerified,
+  cancelClaim,
   getClaims,
   getDetailClaim,
   medicalVerified,
@@ -48,14 +50,11 @@ import {
   updateClaim,
 } from 'services/claim.service';
 import { getAllClient } from 'services/client.service';
-import dashboardLinks from '../../pages/links';
-import { cancelClaim } from './../../services/claim.service';
 import DetailClaim from './DetailClaim';
 import AssignForm from './form/assign-form';
 import RejectForm from './form/reject-form';
 import ReturnForm from './form/return-form';
 import SettleForm from './form/settle-form';
-import dashboardLinks from '../../pages/links';
 
 const { Column } = Table;
 
