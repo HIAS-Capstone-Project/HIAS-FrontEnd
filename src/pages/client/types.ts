@@ -1,4 +1,5 @@
 import { FormInstance, TablePaginationConfig } from 'antd';
+import { IEmployee } from 'pages/employee/types';
 
 export interface IBusinessSector {
   businessSectorName: string;
@@ -15,6 +16,7 @@ export interface IClient {
   phoneNumber: string;
   startDate: string;
   businessSectorNos: number[];
+  employeeResponseDTOS: IEmployee[];
 }
 
 export interface FormProps {
@@ -24,6 +26,7 @@ export interface FormProps {
   confirmLoading: boolean;
   form: FormInstance;
   businessSectors: IBusinessSector[];
+  businessEmployees: IEmployee[];
 }
 
 export interface UpdateFormProps {
@@ -35,6 +38,7 @@ export interface UpdateFormProps {
   form: FormInstance;
   currentRowData: IClient;
   businessSectors: IBusinessSector[];
+  businessEmployees: IEmployee[];
 }
 
 export interface QueryParams {
