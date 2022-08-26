@@ -83,13 +83,15 @@ const MembersLineChart = ({ role }: MembersLineChartIF) => {
     datasets: dataCharts,
   };
   return (
-    <Card style={{ marginBottom: '24px' }}>
-      <Row gutter={24}>
-        <Col span={24}>
-          {<Line options={options} data={data} style={{ maxHeight: 500 }} />}
-        </Col>
-      </Row>
-    </Card>
+    <Col span={24}>
+      <Card style={{ marginBottom: '24px' }}>
+        <Row gutter={24}>
+          <Col span={24}>
+            {<Line options={options} data={data} style={{ maxHeight: 500 }} />}
+          </Col>
+        </Row>
+      </Card>
+    </Col>
   );
 };
 

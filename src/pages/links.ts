@@ -220,11 +220,6 @@ const links: any = {
   ],
   ROLE_BUSINESS_APPRAISER: [
     {
-      to: '/dashboard',
-      name: 'Thống kê',
-      readonly: false,
-    },
-    {
       to: '/claim',
       name: 'Yêu cầu bồi thường',
       readonly: false,

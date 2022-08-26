@@ -10,6 +10,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
+import Loading from 'components/loading';
 import {
   selectLayout,
   selectRoles,
@@ -24,6 +25,7 @@ import { Bar } from 'react-chartjs-2';
 import { getAllClient } from 'services/client.service';
 import { paymentChart } from 'services/dashboard.service';
 import { IFilter } from './types';
+import { ILayoutSlice } from './../../../features/layout/layoutSlice';
 const color = randomColor();
 
 ChartJS.register(
@@ -126,92 +128,107 @@ const PaymentChart = ({ role }: PaymentChartIF) => {
     datasets: mappingData,
   };
   return (
-    <Card style={{ marginBottom: '24px' }}>
-      <Row gutter={24}>
-        <Col span={4}>
-          {/* <ClientNo /> */}
-          <Select
-            style={{ width: '100%' }}
-            defaultValue={filter.clientNo}
-            allowClear
-            onChange={(value: number) => {
-              setFilter({ ...filter, clientNo: value });
-            }}
-            showSearch
-            size="large"
-            placeholder="Chọn doanh nghiệp"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option!.children as unknown as string).includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              (optionA!.children as unknown as string)
-                .toLowerCase()
-                .localeCompare(
-                  (optionB!.children as unknown as string).toLowerCase(),
-                )
-            }
-          >
-            {clients.map(client => {
-              return (
-                <Select.Option key={client.clientNo} value={client.clientNo}>
-                  {client.clientName}
-                </Select.Option>
-              );
-            })}
-          </Select>
-        </Col>
-        <Col span={4}>
-          <Select
-            style={{ width: '100%' }}
-            defaultValue={filter.year}
-            allowClear
-            onChange={(value: number) => {
-              setFilter({ ...filter, year: value, timeFilterBy: 'month' });
-            }}
-            showSearch
-            size="large"
-            placeholder="Chọn năm"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option!.children as unknown as string).includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              (optionA!.children as unknown as string)
-                .toLowerCase()
-                .localeCompare(
-                  (optionB!.children as unknown as string).toLowerCase(),
-                )
-            }
-          >
-            {years.map(year => {
-              return (
-                <Select.Option key={year.value} value={year.value}>
-                  {year.name}
-                </Select.Option>
-              );
-            })}
-          </Select>
-        </Col>
-        <Col span={4}>
-          {filter.year && (
-            <Radio.Group
-              onChange={(e: RadioChangeEvent) => {
-                setFilter({ ...filter, timeFilterBy: e.target.value });
-              }}
-              style={{ paddingTop: '9px' }}
-              defaultValue={filter.timeFilterBy}
-            >
-              <Radio value={'month'}>Theo tháng</Radio>
-              <Radio value={'quarter'}>Theo quý</Radio>
-            </Radio.Group>
-          )}
-        </Col>
+    <>
+      {layout.isloading ? (
+        <Loading />
+      ) : (
         <Col span={24}>
-          <Bar options={options} data={data} style={{ maxHeight: 500 }} />
+          <Card style={{ marginBottom: '24px' }}>
+            <Row gutter={24}>
+              <Col span={4}>
+                {/* <ClientNo /> */}
+                <Select
+                  style={{ width: '100%' }}
+                  defaultValue={filter.clientNo}
+                  allowClear
+                  onChange={(value: number) => {
+                    setFilter({ ...filter, clientNo: value });
+                  }}
+                  showSearch
+                  size="large"
+                  placeholder="Chọn doanh nghiệp"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option!.children as unknown as string).includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA!.children as unknown as string)
+                      .toLowerCase()
+                      .localeCompare(
+                        (optionB!.children as unknown as string).toLowerCase(),
+                      )
+                  }
+                >
+                  {clients.map(client => {
+                    return (
+                      <Select.Option
+                        key={client.clientNo}
+                        value={client.clientNo}
+                      >
+                        {client.clientName}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </Col>
+              <Col span={4}>
+                <Select
+                  style={{ width: '100%' }}
+                  defaultValue={filter.year}
+                  allowClear
+                  onChange={(value: number) => {
+                    setFilter({
+                      ...filter,
+                      year: value,
+                      timeFilterBy: 'month',
+                    });
+                  }}
+                  showSearch
+                  size="large"
+                  placeholder="Chọn năm"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option!.children as unknown as string).includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA!.children as unknown as string)
+                      .toLowerCase()
+                      .localeCompare(
+                        (optionB!.children as unknown as string).toLowerCase(),
+                      )
+                  }
+                >
+                  {years.map(year => {
+                    return (
+                      <Select.Option key={year.value} value={year.value}>
+                        {year.name}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </Col>
+              <Col span={4}>
+                {filter.year && (
+                  <Radio.Group
+                    onChange={(e: RadioChangeEvent) => {
+                      setFilter({ ...filter, timeFilterBy: e.target.value });
+                    }}
+                    style={{ paddingTop: '9px' }}
+                    defaultValue={filter.timeFilterBy}
+                  >
+                    <Radio value={'month'}>Theo tháng</Radio>
+                    <Radio value={'quarter'}>Theo quý</Radio>
+                  </Radio.Group>
+                )}
+              </Col>
+              <Col span={24}>
+                <Bar options={options} data={data} style={{ maxHeight: 500 }} />
+              </Col>
+            </Row>
+          </Card>
         </Col>
-      </Row>
-    </Card>
+      )}
+    </>
   );
 };
 

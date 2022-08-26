@@ -1,20 +1,19 @@
 import { Card, Col, Row } from 'antd';
-import GenderBarChart from 'components/chart/GenderBarChart';
-import AgePieChart from 'components/chart/AgePieChart';
-import './index.css';
-import MembersLineChart from 'components/chart/MembersLineChart';
-import Color from 'constants/colors';
-import NumberCard from 'components/numberCard';
-import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import { useAppSelector } from 'app/hooks';
+import AgePieChart from 'components/chart/AgePieChart';
 import BussinessSector from 'components/chart/BusinessSectorChart';
-import LocationChart from 'components/chart/LocationChart';
 import ClaimByAllStatus from 'components/chart/ClaimByAllStatus';
 import ClaimBySpecialStatus from 'components/chart/ClaimBySpecialStatus';
+import GenderBarChart from 'components/chart/GenderBarChart';
+import LocationChart from 'components/chart/LocationChart';
+import MembersLineChart from 'components/chart/MembersLineChart';
+import PaymentChart from 'components/chart/PaymentChart';
+import NumberCard from 'components/numberCard';
+import Color from 'constants/colors';
+import { selectCurrentUser } from 'features/authentication/authenticationSlice';
 import { useEffect, useState } from 'react';
 import { findAll } from 'services/dashboard.service';
-import PaymentChart from 'components/chart/PaymentChart';
-import ClientNo from 'components/clientNo';
+import './index.css';
 
 const Dashboard = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -66,8 +65,8 @@ const Dashboard = () => {
   return (
     <div className="app-container">
       <Row gutter={24}>{numberCards}</Row>
-      <Col span={24}>{<PaymentChart role={user?.role} />}</Col>
-      <Col span={24}>{<MembersLineChart role={user?.role} />}</Col>
+      <PaymentChart role={user?.role} />
+      <MembersLineChart role={user?.role} />
       <Card style={{ marginBottom: '24px' }}>
         <Row gutter={24}>
           <Col span={12}>{<AgePieChart role={user?.role} />}</Col>
