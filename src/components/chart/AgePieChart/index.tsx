@@ -39,6 +39,7 @@ const AgePieChart = ({ role }: AgePieChartIF) => {
   useEffect(() => {
     policyByUsageChart().then((response: any) => {
       setRes(response.data.statistics);
+      options.plugins.title.text = response.data.chartName;
       dispatch(setRoles(response.data?.roles));
     });
   }, []);

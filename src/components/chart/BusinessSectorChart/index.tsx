@@ -39,6 +39,7 @@ const BussinessSector = ({ role }: BussinessPieChartIF) => {
   useEffect(() => {
     businessSector().then((response: any) => {
       setRes(response.data.statistics);
+      options.plugins.title.text = response.data.chartName;
       dispatch(setRoles(response.data?.roles));
     });
   }, []);

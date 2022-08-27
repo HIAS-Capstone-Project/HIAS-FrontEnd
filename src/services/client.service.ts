@@ -7,6 +7,12 @@ export const getAllClient = async () => {
   const response = await httpProvider.get<IClient[]>('client/get-all');
   return response.data;
 };
+export const getAllClientByRole = async () => {
+  const response = await httpProvider.get<IClient[]>(
+    'client/find-all-has-filter-role',
+  );
+  return response.data;
+};
 
 export const getClients = async (params: QueryParams) => {
   const { pagination, key } = params;

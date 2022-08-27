@@ -15,6 +15,7 @@ import {
   selectLayout,
   selectRoles,
   setPermissions,
+  setRoles,
   showLoading,
 } from 'features/layout/layoutSlice';
 import _ from 'lodash';
@@ -25,8 +26,6 @@ import { Bar } from 'react-chartjs-2';
 import { getAllClient } from 'services/client.service';
 import { paymentChart } from 'services/dashboard.service';
 import { IFilter } from './types';
-import { ILayoutSlice } from './../../../features/layout/layoutSlice';
-const color = randomColor();
 
 ChartJS.register(
   CategoryScale,
@@ -89,6 +88,8 @@ const PaymentChart = ({ role }: PaymentChartIF) => {
       .then(response => {
         if (res) {
           setRes(response.statistics);
+          options.plugins.title.text = response.chartName;
+          dispatch(setRoles(response?.roles));
         }
       })
       .finally(() => {

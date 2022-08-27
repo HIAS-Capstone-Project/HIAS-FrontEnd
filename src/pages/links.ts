@@ -65,7 +65,7 @@ const links: any = {
     {
       to: '/policy',
       name: 'Chính sách',
-      readonly: false,
+      readonly: true,
     },
     {
       to: '/benefit',
@@ -264,7 +264,7 @@ const links: any = {
     {
       to: '/client',
       name: 'Doanh nghiệp',
-      readonly: false,
+      readonly: true,
     },
     {
       to: '/benefit',

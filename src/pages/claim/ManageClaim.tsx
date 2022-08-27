@@ -296,40 +296,42 @@ const ManageClaim = () => {
             Thêm Yêu cầu bồi thường
           </Button>
         )}
-        <Select
-          defaultValue={filter.clientNo}
-          allowClear
-          onChange={(value: number) => {
-            getClaimList({
-              pagination,
-              filter: { ...filter, clientNo: value },
-            });
-            setFilter({ ...filter, clientNo: value });
-            setClaim({} as IClaim);
-          }}
-          showSearch
-          size="large"
-          placeholder="Chọn doanh nghiệp"
-          optionFilterProp="children"
-          filterOption={(input, option) =>
-            (option!.children as unknown as string).includes(input)
-          }
-          filterSort={(optionA, optionB) =>
-            (optionA!.children as unknown as string)
-              .toLowerCase()
-              .localeCompare(
-                (optionB!.children as unknown as string).toLowerCase(),
-              )
-          }
-        >
-          {clients.map(client => {
-            return (
-              <Select.Option key={client.clientNo} value={client.clientNo}>
-                {client.clientName}
-              </Select.Option>
-            );
-          })}
-        </Select>
+        {user.role !== ROLE.MEMBER && (
+          <Select
+            defaultValue={filter.clientNo}
+            allowClear
+            onChange={(value: number) => {
+              getClaimList({
+                pagination,
+                filter: { ...filter, clientNo: value },
+              });
+              setFilter({ ...filter, clientNo: value });
+              setClaim({} as IClaim);
+            }}
+            showSearch
+            size="large"
+            placeholder="Chọn doanh nghiệp"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option!.children as unknown as string).includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              (optionA!.children as unknown as string)
+                .toLowerCase()
+                .localeCompare(
+                  (optionB!.children as unknown as string).toLowerCase(),
+                )
+            }
+          >
+            {clients.map(client => {
+              return (
+                <Select.Option key={client.clientNo} value={client.clientNo}>
+                  {client.clientName}
+                </Select.Option>
+              );
+            })}
+          </Select>
+        )}
         <Select
           defaultValue={filter.statusCode}
           allowClear

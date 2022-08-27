@@ -39,7 +39,7 @@ const options = {
     },
     title: {
       display: true,
-      text: 'All members',
+      text: 'Người thành viên tham gia bảo hiểm theo năm',
     },
   },
 };

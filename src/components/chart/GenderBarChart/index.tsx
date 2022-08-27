@@ -43,7 +43,10 @@ const GenderBarChart = ({ role }: GenderBarChartIF) => {
   const value: any = [];
 
   useEffect(() => {
-    chartGender().then((response: any) => setRes(response.data.statistics));
+    chartGender().then((response: any) => {
+      setRes(response.data.statistics);
+      options.plugins.title.text = response.data.chartName;
+    });
   }, []);
 
   res.forEach((i: any) => {

@@ -38,6 +38,7 @@ const ClaimBySpecialStatus = ({ role }: LocationChartIF) => {
   useEffect(() => {
     claimBySpecialStatusChart().then((response: any) => {
       setRes(response.data.statistics);
+      options.plugins.title.text = response.data.chartName;
       dispatch(setRoles(response.data?.roles));
     });
   }, []);
