@@ -72,35 +72,39 @@ const AssignForm = (props: FormProps) => {
       });
   };
 
+  const getDataForm = async () => {
+    await getBusinessAppraisals();
+    if (
+      [STATUS.BUSINESS_VERIFIED, STATUS.MEDICAL_VERIFYING].find(
+        status => status.key === claim.statusCode,
+      )
+    ) {
+      await getMedicalAppraisals();
+    }
+    if (
+      [STATUS.MEDICAL_VERIFIED, STATUS.WAITING_FOR_APPROVAL].find(
+        status => status.key === claim.statusCode,
+      )
+    ) {
+      await getMedicalAppraisals();
+      getApprovers();
+    }
+    if (
+      [STATUS.APPROVED, STATUS.PAYMENT_PROCESSING].find(
+        status => status.key === claim.statusCode,
+      )
+    ) {
+      await getMedicalAppraisals();
+      await getApprovers();
+      await getAccountants();
+    }
+  };
+
   useEffect(() => {
     if (visible) {
-      getBusinessAppraisals();
-      if (
-        [STATUS.BUSINESS_VERIFIED, STATUS.MEDICAL_VERIFYING].find(
-          status => status.key === claim.statusCode,
-        )
-      ) {
-        getMedicalAppraisals();
-      }
-      if (
-        [STATUS.MEDICAL_VERIFIED, STATUS.WAITING_FOR_APPROVAL].find(
-          status => status.key === claim.statusCode,
-        )
-      ) {
-        getMedicalAppraisals();
-        getApprovers();
-      }
-      if (
-        [STATUS.APPROVED, STATUS.PAYMENT_PROCESSING].find(
-          status => status.key === claim.statusCode,
-        )
-      ) {
-        getMedicalAppraisals();
-        getApprovers();
-        getAccountants();
-      }
+      getDataForm();
     }
-  }, [claim.claimNo]);
+  }, []);
 
   const initialValues = useMemo(() => {
     if (_.isEmpty(claim)) return undefined;
@@ -172,13 +176,17 @@ const AssignForm = (props: FormProps) => {
                 placeholder="Chọn nhân viên xác minh nghiệp vụ"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  (option!.children as unknown as string).includes(input)
+                  (option!.children?.join() as unknown as string).includes(
+                    input,
+                  )
                 }
                 filterSort={(optionA, optionB) =>
-                  (optionA!.children as unknown as string)
+                  (optionA!.children as unknown as string[])[2]
                     .toLowerCase()
                     .localeCompare(
-                      (optionB!.children as unknown as string).toLowerCase(),
+                      (
+                        optionB!.children as unknown as string[]
+                      )[2].toLowerCase(),
                     )
                 }
               >
@@ -212,13 +220,17 @@ const AssignForm = (props: FormProps) => {
                 placeholder="Chọn nhân viên xác minh y tế"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  (option!.children as unknown as string).includes(input)
+                  (option!.children?.join() as unknown as string).includes(
+                    input,
+                  )
                 }
                 filterSort={(optionA, optionB) =>
-                  (optionA!.children as unknown as string)
+                  (optionA!.children as unknown as string[])[2]
                     .toLowerCase()
                     .localeCompare(
-                      (optionB!.children as unknown as string).toLowerCase(),
+                      (
+                        optionB!.children as unknown as string[]
+                      )[2].toLowerCase(),
                     )
                 }
               >
@@ -249,13 +261,17 @@ const AssignForm = (props: FormProps) => {
                 placeholder="Chọn nhân viên phê duyệt hồ sơ"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  (option!.children as unknown as string).includes(input)
+                  (option!.children?.join() as unknown as string).includes(
+                    input,
+                  )
                 }
                 filterSort={(optionA, optionB) =>
-                  (optionA!.children as unknown as string)
+                  (optionA!.children as unknown as string[])[2]
                     .toLowerCase()
                     .localeCompare(
-                      (optionB!.children as unknown as string).toLowerCase(),
+                      (
+                        optionB!.children as unknown as string[]
+                      )[2].toLowerCase(),
                     )
                 }
               >
@@ -286,13 +302,17 @@ const AssignForm = (props: FormProps) => {
                 placeholder="Chọn nhân viên kế toán"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  (option!.children as unknown as string).includes(input)
+                  (option!.children?.join() as unknown as string).includes(
+                    input,
+                  )
                 }
                 filterSort={(optionA, optionB) =>
-                  (optionA!.children as unknown as string)
+                  (optionA!.children as unknown as string[])[2]
                     .toLowerCase()
                     .localeCompare(
-                      (optionB!.children as unknown as string).toLowerCase(),
+                      (
+                        optionB!.children as unknown as string[]
+                      )[2].toLowerCase(),
                     )
                 }
               >
