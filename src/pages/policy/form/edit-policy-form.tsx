@@ -96,7 +96,7 @@ const EditPolicyForm = (props: UpdateFormProps) => {
             { required: true, message: 'Hãy chọn ít nhất một quyền lợi!' },
           ]}
         >
-          <Checkbox.Group options={options} />
+          <Checkbox.Group disabled options={options} />
         </Form.Item>
 
         <Form.Item name="remark" label="Ghi chú:">

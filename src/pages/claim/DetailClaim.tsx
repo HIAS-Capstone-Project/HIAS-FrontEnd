@@ -1,10 +1,12 @@
+import { EyeOutlined } from '@ant-design/icons';
 import { Card, Col, List, Row, Typography } from 'antd';
 import { STATUS_LIST } from 'constants/claim-status';
 import DateFormat from 'constants/date-format';
 import _ from 'lodash';
 import moment from 'moment';
 import { IClaim } from 'pages/claim/types';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import StatusProgress from './progress';
 
 const { Title } = Typography;
 
@@ -16,6 +18,12 @@ interface IDetailClaimProps {
 const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
   (props: IDetailClaimProps, ref) => {
     const { claim } = props;
+
+    const [statusProgressVisible, setStatusProgressVisible] = useState(false);
+
+    const handleToggleStatusProcess = () => {
+      setStatusProgressVisible(pre => !pre);
+    };
 
     const licenseList = useMemo(() => {
       if (_.isEmpty(claim?.claimDocumentResponseDTOS)) return [];
@@ -55,7 +63,12 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
         <Card
           type="inner"
           title={<Title level={4}>Trạng thái</Title>}
-          // extra={<a href="#"></a>}
+          extra={
+            <EyeOutlined
+              style={{ fontSize: '150%' }}
+              onClick={handleToggleStatusProcess}
+            />
+          }
         >
           {
             STATUS_LIST.find((item: any) => item.key === claim.statusCode)
@@ -304,6 +317,13 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
             )}
           </Row>
         </Card>
+        {statusProgressVisible && (
+          <StatusProgress
+            claim={claim}
+            onCancel={handleToggleStatusProcess}
+            visible={statusProgressVisible}
+          />
+        )}
       </Card>
     );
   },

@@ -1,5 +1,6 @@
 import { ILicense } from 'models/license/types';
 import { IClaim, IClaimDocumentRequestDTO } from 'pages/claim/types';
+import { IEmployee } from 'pages/employee/types';
 
 export interface IClaimDocumentResponseDTO {
   claimDocumentNo: number;
@@ -32,4 +33,17 @@ export interface IClaimSubmitRequestDTO {
   memberNo: number;
   serviceProviderNo: number;
   claimDocumentRequestDTOS: IClaimDocumentRequestDTO[];
+}
+
+export interface IClaimHistoryResponseDTO {
+  actionType: string;
+  claimNo: number;
+  claimRequestHistoryNo: number;
+  createdOn: string;
+  employeeNo: number;
+  employeeResponseDTO: IEmployee;
+  fromStatusCode: string;
+  modifiedOn: string;
+  remark: string;
+  toStatusCode: string;
 }

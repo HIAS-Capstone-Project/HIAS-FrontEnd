@@ -23,7 +23,7 @@ import { IClient } from 'pages/client/types';
 import randomColor from 'randomcolor';
 import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import { getAllClient } from 'services/client.service';
+import { getAllClientByRole } from 'services/client.service';
 import { paymentChart } from 'services/dashboard.service';
 import { IFilter } from './types';
 
@@ -70,7 +70,7 @@ const PaymentChart = ({ role }: PaymentChartIF) => {
 
   const getClientList = async () => {
     dispatch(showLoading(true));
-    getAllClient()
+    getAllClientByRole()
       .then(res => {
         if (res) {
           if (_.isEmpty(res)) return;

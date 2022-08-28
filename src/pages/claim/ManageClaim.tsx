@@ -49,7 +49,7 @@ import {
   startProgressVerify,
   updateClaim,
 } from 'services/claim.service';
-import { getAllClient } from 'services/client.service';
+import { getAllClientByRole } from 'services/client.service';
 import DetailClaim from './DetailClaim';
 import AssignForm from './form/assign-form';
 import RejectForm from './form/reject-form';
@@ -225,7 +225,7 @@ const ManageClaim = () => {
 
   const getClientList = async () => {
     dispatch(showLoading(true));
-    getAllClient()
+    getAllClientByRole()
       .then(res => {
         if (res) {
           if (_.isEmpty(res)) return;
@@ -1037,14 +1037,16 @@ const ManageClaim = () => {
             onOk={handleSettleOK}
             onCancel={handleCancel}
           />
-          <AssignForm
-            claim={currentRowData}
-            confirmLoading={assignLoading}
-            form={formAssign}
-            visible={assignVisible}
-            onOk={handleAssignOK}
-            onCancel={handleCancel}
-          />
+          {assignVisible && (
+            <AssignForm
+              claim={currentRowData}
+              confirmLoading={assignLoading}
+              form={formAssign}
+              visible={assignVisible}
+              onOk={handleAssignOK}
+              onCancel={handleCancel}
+            />
+          )}
 
           <ConfirmDialog
             visible={confirmVisible}

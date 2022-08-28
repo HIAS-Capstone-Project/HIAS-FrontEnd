@@ -23,7 +23,7 @@ import { IPolicy } from 'pages/policy/types';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import { getAllBank } from 'services/bank.service';
-import { getAllClient } from 'services/client.service';
+import { getAllClientByRole } from 'services/client.service';
 import dashboardLinks from '../../pages/links';
 import {
   addMember,
@@ -143,7 +143,7 @@ const MemberPage = () => {
   };
 
   const getClientList = async () => {
-    getAllClient().then(res => {
+    getAllClientByRole().then(res => {
       if (res) {
         if (_.isEmpty(res)) return;
         setClients(res);

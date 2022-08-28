@@ -1,5 +1,9 @@
 import httpProvider from 'http/http-provider';
-import { IClaimResponse, IClaimSubmitRequestDTO } from 'models/claim/types';
+import {
+  IClaimHistoryResponseDTO,
+  IClaimResponse,
+  IClaimSubmitRequestDTO,
+} from 'models/claim/types';
 import {
   IClaim,
   IClaimPaymentRequestDTO,
@@ -94,5 +98,12 @@ export const updateClaim = async (param: IClaimUpdateRequestDTO) => {
 
 export const returnClaim = async (param: IClaimReturnRequestDTO) => {
   const response = await httpProvider.post<any>('claim/return-claim', param);
+  return response.data;
+};
+
+export const getStatusProcessClaim = async (param: number) => {
+  const response = await httpProvider.get<IClaimHistoryResponseDTO[]>(
+    `claim-remark-history/find-by-claim-no/${param}`,
+  );
   return response.data;
 };
