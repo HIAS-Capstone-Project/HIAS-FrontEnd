@@ -350,7 +350,7 @@ const ManageClaim = () => {
         >
           {optionStatusCode.map(statusCode => {
             return (
-              <Select.Option key={statusCode.key} value={statusCode.value}>
+              <Select.Option key={statusCode.key} value={statusCode.key}>
                 {statusCode.value}
               </Select.Option>
             );
