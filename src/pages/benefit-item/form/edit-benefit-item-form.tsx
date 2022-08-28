@@ -120,15 +120,34 @@ const EditBenefitItemForm = (props: UpdateFormProps) => {
               required: true,
               message: 'Hãy nhập vào chi phí được chi trả!',
             },
+            {
+              type: 'number',
+              min: -1,
+              message: 'Chi phí yêu cầu bồi thường phải lớn hơn 0',
+            },
           ]}
         >
           <InputNumber
             controls={false}
             style={{ width: '100%' }}
-            min={0}
+            formatter={value => {
+              let res = `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+              const index = res.indexOf('.');
+              if (index !== -1) {
+                const decimal = res
+                  .slice(index)
+                  .replace(/\$\s?|(,*)/g, '')
+                  .slice(0, 4);
+                res = res.slice(0, index);
+                return res.concat(decimal);
+              }
+              return res;
+            }}
+            parser={value => Number(value!.replace(/\$\s?|(,*)/g, ''))}
             autoComplete="false"
             size="large"
-            placeholder="Nhập vào chi phí được chi trả"
+            placeholder="Nhập vào chi phí đã chi trả"
+            addonAfter={<>VNĐ</>}
           />
         </Form.Item>
 
