@@ -68,7 +68,7 @@ const Summary = (props: ISummaryProps) => {
                   </Card>
                 </Col>
                 <Col span={8}>
-                  <Card title="Chi phí đã chi trả">
+                  <Card title="Chi phí yêu cầu bồi thường:">
                     {`${form
                       .getFieldValue('claimAmount')
                       ?.toString()

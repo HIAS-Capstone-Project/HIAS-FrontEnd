@@ -202,7 +202,7 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
               </Col>
             )}
             <Col span={8}>
-              <Card type="inner" title="Chi phí đã chi trả">
+              <Card type="inner" title="Chi phí yêu cầu bồi thường">
                 {(claim?.claimAmount || 0)
                   ?.toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}

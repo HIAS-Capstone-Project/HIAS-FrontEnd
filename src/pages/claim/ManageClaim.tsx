@@ -21,7 +21,8 @@ import { useAppDispatch, useAppSelector } from 'app/hooks';
 import ConfirmDialog from 'components/confirm-dialog';
 import Loading from 'components/loading';
 import { openNotificationWithIcon } from 'components/notification';
-import STATUS from 'constants/claim-status';
+import Status from 'components/status-label';
+import STATUS, { STATUS_LIST } from 'constants/claim-status';
 import DateFormat from 'constants/date-format';
 import ROLE from 'constants/roles';
 import { selectCurrentUser } from 'features/authentication/authenticationSlice';
@@ -296,7 +297,7 @@ const ManageClaim = () => {
             Thêm Yêu cầu bồi thường
           </Button>
         )}
-        {user.role !== ROLE.MEMBER && (
+        {user.role !== ROLE.MEMBER && user.role !== ROLE.CLIENT && (
           <Select
             defaultValue={filter.clientNo}
             allowClear
@@ -911,9 +912,9 @@ const ManageClaim = () => {
     }
 
     if (
-      claim.statusCode === STATUS.DRAFT.key ||
-      (claim.statusCode === STATUS.RETURN.key &&
-        (role === ROLE.MEMBER || role === ROLE.SERVICE_PROVIDER))
+      (claim.statusCode === STATUS.DRAFT.key ||
+        claim.statusCode === STATUS.RETURN.key) &&
+      (role === ROLE.MEMBER || role === ROLE.SERVICE_PROVIDER)
     ) {
       return (
         <>
@@ -993,6 +994,17 @@ const ManageClaim = () => {
                 dataIndex="status"
                 key="status"
                 align="center"
+                render={(text, row: IClaim) => {
+                  return (
+                    <Status
+                      statusCode={row.statusCode}
+                      tooltip={
+                        STATUS_LIST.find(item => item.key === row.statusCode)
+                          ?.value || ''
+                      }
+                    />
+                  );
+                }}
               />
               <Column
                 title="Lần cuối sửa đổi"

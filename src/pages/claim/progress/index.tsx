@@ -1,5 +1,6 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { Modal, Spin, Timeline } from 'antd';
+import { mappingColorStatus } from 'helper';
 import _ from 'lodash';
 import { IClaimHistoryResponseDTO } from 'models/claim/types';
 import moment from 'moment';
@@ -24,12 +25,42 @@ const StatusProgress = (props: IProps) => {
       .then(res => {
         if (res) {
           if (_.isEmpty(res)) return;
-          setData(res);
+          setData(res.reverse());
         }
       })
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  const renderTimeLineItemContent = (item: IClaimHistoryResponseDTO) => {
+    if (item.actionType === 'ACP') {
+      return `Hệ thống ${item.remark}`;
+    } else if (_.isEmpty(item.employeeResponseDTO)) {
+      return `${item.memberResponseDTO.memberName} ${item.remark}`;
+    } else if (!_.isEmpty(item.employeeResponseDTO)) {
+      return `${item.employeeResponseDTO.employeeName} ${item.remark}`;
+    }
+  };
+
+  const renderTimeLineContent = () => {
+    return (
+      <Timeline mode="left">
+        {data.map(item => {
+          return (
+            <Timeline.Item
+              color={mappingColorStatus(item.toStatusCode)}
+              key={item.claimRequestHistoryNo}
+              label={moment(item.createdOn, DateFormat.YYYYMMDDT).format(
+                DateFormat.DDMMYYYYHHSSMM,
+              )}
+            >
+              {renderTimeLineItemContent(item)}
+            </Timeline.Item>
+          );
+        })}
+      </Timeline>
+    );
   };
 
   useEffect(() => {
@@ -40,6 +71,7 @@ const StatusProgress = (props: IProps) => {
 
   return (
     <Modal
+      width={700}
       title="Chi tiết trạng thái của yêu cầu bồi thường"
       visible={visible}
       onCancel={() => {
@@ -57,20 +89,7 @@ const StatusProgress = (props: IProps) => {
           />
         </div>
       ) : (
-        <Timeline mode="left">
-          {data.map(item => {
-            return (
-              <Timeline.Item
-                key={item.claimRequestHistoryNo}
-                label={moment(item.createdOn, DateFormat.YYYYMMDDT).format(
-                  DateFormat.DDMMYYYYHHSSMM,
-                )}
-              >
-                {`${item.employeeResponseDTO.employeeName} đã ${item.remark}`}
-              </Timeline.Item>
-            );
-          })}
-        </Timeline>
+        renderTimeLineContent()
       )}
     </Modal>
   );

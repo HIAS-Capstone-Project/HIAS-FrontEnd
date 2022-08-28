@@ -136,7 +136,7 @@ const BenefitClaim = (props: IBenefitClaimProps) => {
 
           <Form.Item
             name="claimAmount"
-            label="Chi phí đã chi trả"
+            label="Chi phí yêu cầu bồi thường:"
             rules={[
               {
                 required: true,

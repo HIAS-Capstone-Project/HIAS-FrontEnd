@@ -21,12 +21,12 @@ const SettleForm = (props: FormProps) => {
         <Form.Item
           initialValue={claim.claimAmount}
           name="claimAmount"
-          label="Chi phí yêu cầu chi trả:"
+          label="Chi phí yêu cầu bồi thường:"
         >
           <Input
             disabled
             size="large"
-            placeholder="Nhập vào chi phí yêu cầu chi trả"
+            placeholder="Nhập vào chi phí yêu cầu bồi thường"
           />
         </Form.Item>
         <Form.Item
