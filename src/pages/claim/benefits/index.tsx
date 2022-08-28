@@ -131,6 +131,7 @@ const BenefitClaim = (props: IBenefitClaimProps) => {
               size="large"
               placeholder={['Từ ngày', 'Đến ngày']}
               format={DateFormat.DDMMYYYY}
+              disabledDate={current => current.isAfter(moment())}
             />
           </Form.Item>
 
