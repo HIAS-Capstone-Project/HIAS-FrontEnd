@@ -81,17 +81,6 @@ interface IClaimPageState {
   returnLoading: boolean;
 }
 
-const option = [
-  { value: STATUS.DRAFT.key, name: 'DRAFT' },
-  { value: STATUS.SUBMITTED.key, name: 'SUBMITTED' },
-  { value: STATUS.BUSINESS_VERIFIED.key, name: 'BUSINESS_VERIFIED' },
-  { value: STATUS.MEDICAL_VERIFIED.key, name: 'MEDICAL_VERIFIED' },
-  { value: STATUS.APPROVED.key, name: 'APPROVED' },
-  { value: STATUS.SETTLED.key, name: 'SETTLED' },
-  { value: STATUS.REJECTED.key, name: 'REJECTED' },
-  { value: STATUS.RETURN.key, name: 'RETURN' },
-];
-
 const ManageClaim = () => {
   const dispatch = useAppDispatch();
   const layout = useAppSelector(selectLayout);
@@ -270,9 +259,9 @@ const ManageClaim = () => {
 
   const optionStatusCode = useMemo(() => {
     if (![ROLE.MEMBER, ROLE.SERVICE_PROVIDER].includes(user.role)) {
-      return option.filter(item => item.value !== STATUS.DRAFT.key);
+      return STATUS_LIST.filter(item => item.key !== STATUS.DRAFT.key);
     }
-    return option;
+    return STATUS_LIST;
   }, [user.role]);
 
   const title = (
@@ -361,8 +350,8 @@ const ManageClaim = () => {
         >
           {optionStatusCode.map(statusCode => {
             return (
-              <Select.Option key={statusCode.value} value={statusCode.value}>
-                {statusCode.name}
+              <Select.Option key={statusCode.key} value={statusCode.value}>
+                {statusCode.value}
               </Select.Option>
             );
           })}
