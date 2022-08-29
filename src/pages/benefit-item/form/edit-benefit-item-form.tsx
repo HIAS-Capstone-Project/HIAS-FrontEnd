@@ -123,7 +123,7 @@ const EditBenefitItemForm = (props: UpdateFormProps) => {
             {
               type: 'number',
               min: -1,
-              message: 'Chi phí yêu cầu bồi thường phải lớn hơn 0',
+              message: 'Chi phí được chi trả phải lớn hơn 0',
             },
           ]}
         >

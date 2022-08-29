@@ -1,4 +1,12 @@
-import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd';
+import {
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Radio,
+  Select,
+} from 'antd';
 import DateFormat from 'constants/date-format';
 import _ from 'lodash';
 import moment from 'moment';
@@ -186,7 +194,9 @@ const EditMemberForm = (props: UpdateFormProps) => {
             },
           ]}
         >
-          <Input
+          <InputNumber
+            controls={false}
+            style={{ width: '100%' }}
             addonBefore={
               <Form.Item
                 name="bankNo"
