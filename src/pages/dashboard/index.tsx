@@ -33,7 +33,7 @@ const Dashboard = () => {
     {
       icon: 'pay-circle-o',
       color: Color.green,
-      title: 'Thành viên',
+      title: 'Người tham gia bảo hiểm',
       number: number[2]?.value,
     },
     {
