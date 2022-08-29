@@ -331,7 +331,7 @@ const AddMemberForm = (props: FormProps) => {
           label="Chính sách:"
           rules={[
             {
-              required: !_.isEmpty(policyList),
+              required: true,
               message: 'Hãy chọn chính sách',
             },
           ]}

@@ -179,11 +179,11 @@ const MemberPage = () => {
   };
 
   useEffect(() => {
-    getMemberList({ pagination });
     getClientList();
     getPolicyList();
     getBankList();
     getProvinceList();
+    getMemberList({ pagination });
   }, []);
 
   const handleAddMember = () => {

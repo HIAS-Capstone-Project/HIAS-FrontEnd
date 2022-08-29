@@ -344,11 +344,12 @@ const CreateClaimPage = () => {
 
     if (!_.isEmpty(fieldValue.timeRange)) {
       value.admissionFromDate = fieldValue?.timeRange[0]
-        .format(DateFormat.DDMMYYYY)
+        ?.format(DateFormat.DDMMYYYY)
         .concat(' 00:00:00');
-      value.admissionToDate = fieldValue?.timeRange[1]
-        .format(DateFormat.DDMMYYYY)
-        .concat(' 00:00:00');
+      value.admissionToDate =
+        fieldValue?.timeRange[1]
+          ?.format(DateFormat.DDMMYYYY)
+          .concat(' 00:00:00') || null;
     }
     delete value.timeRange;
     licenseList.forEach(license => {

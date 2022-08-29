@@ -16,6 +16,7 @@ import {
   Space,
   Table,
   TablePaginationConfig,
+  Tooltip,
 } from 'antd';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import ConfirmDialog from 'components/confirm-dialog';
@@ -273,7 +274,7 @@ const ManageClaim = () => {
         direction="horizontal"
         // style={{ justifyContent: 'space-between', width: '100%' }}
       >
-        {!readonly && (
+        {!readonly && user.role !== ROLE.ADMIN && (
           <Button
             size="large"
             type="primary"
@@ -843,62 +844,72 @@ const ManageClaim = () => {
     if (isShowIcon) {
       if (role === ROLE.ADMIN) {
         return (
-          <EditTwoTone
-            style={{ fontSize: '200%' }}
-            onClick={(e: MouseEvent) => {
-              e.stopPropagation();
-              handleAssign(claim);
-            }}
-          />
+          <Tooltip placement="bottom" title="Chỉnh sửa">
+            <EditTwoTone
+              style={{ fontSize: '200%' }}
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                handleAssign(claim);
+              }}
+            />
+          </Tooltip>
         );
       }
       if (isVerifyingStatus(claim.statusCode)) {
         return (
           <>
-            <FileDoneOutlined
-              style={{ fontSize: '200%', color: '#52c41a' }}
-              onClick={(e: MouseEvent) => {
-                e.stopPropagation();
-                if (user.role === ROLE.ACCOUNTANT) {
-                  handleSettle(claim);
-                } else {
-                  handleVerify(claim);
-                }
-              }}
-            />
-            <Divider type="vertical" style={{ fontSize: '200%' }} />
-            {role !== ROLE.ACCOUNTANT && (
-              <FileExcelOutlined
-                style={{ fontSize: '200%', color: '#ff4d4f' }}
+            <Tooltip placement="bottom" title="Phê duyệt">
+              <FileDoneOutlined
+                style={{ fontSize: '200%', color: '#52c41a' }}
                 onClick={(e: MouseEvent) => {
                   e.stopPropagation();
-                  handleReject(claim);
+                  if (user.role === ROLE.ACCOUNTANT) {
+                    handleSettle(claim);
+                  } else {
+                    handleVerify(claim);
+                  }
                 }}
               />
+            </Tooltip>
+            <Divider type="vertical" style={{ fontSize: '200%' }} />
+            {role !== ROLE.ACCOUNTANT && (
+              <Tooltip placement="bottom" title="Từ chối">
+                <FileExcelOutlined
+                  style={{ fontSize: '200%', color: '#ff4d4f' }}
+                  onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    handleReject(claim);
+                  }}
+                />
+              </Tooltip>
             )}
             {role !== ROLE.ACCOUNTANT && (
               <>
                 <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <ReloadOutlined
-                  style={{ fontSize: '200%', color: '#52c41a' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleReturn(claim);
-                  }}
-                />
+                <Tooltip placement="bottom" title="Trả lại">
+                  <ReloadOutlined
+                    style={{ fontSize: '200%', color: '#52c41a' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleReturn(claim);
+                    }}
+                  />
+                </Tooltip>
               </>
             )}
           </>
         );
       } else {
         return (
-          <ExportOutlined
-            style={{ fontSize: '200%', color: '#faad14' }}
-            onClick={(e: MouseEvent) => {
-              e.stopPropagation();
-              handleStartProgress(claim);
-            }}
-          />
+          <Tooltip placement="bottom" title="Bắt đầu kiểm duyệt">
+            <ExportOutlined
+              style={{ fontSize: '200%', color: '#faad14' }}
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                handleStartProgress(claim);
+              }}
+            />
+          </Tooltip>
         );
       }
     }
@@ -910,21 +921,25 @@ const ManageClaim = () => {
     ) {
       return (
         <>
-          <EditTwoTone
-            style={{ fontSize: '200%' }}
-            onClick={(e: MouseEvent) => {
-              e.stopPropagation();
-              navigate(`/create-claim/${claim.claimNo}`);
-            }}
-          />
+          <Tooltip placement="bottom" title="Chỉnh sửa">
+            <EditTwoTone
+              style={{ fontSize: '200%' }}
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                navigate(`/create-claim/${claim.claimNo}`);
+              }}
+            />
+          </Tooltip>
           <Divider type="vertical" style={{ fontSize: '200%' }} />
-          <CloseCircleOutlined
-            style={{ fontSize: '200%', color: '#ff4d4f' }}
-            onClick={(e: MouseEvent) => {
-              e.stopPropagation();
-              handleCancelClaim(claim);
-            }}
-          />
+          <Tooltip placement="bottom" title="Hủy bỏ">
+            <CloseCircleOutlined
+              style={{ fontSize: '200%', color: '#ff4d4f' }}
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                handleCancelClaim(claim);
+              }}
+            />
+          </Tooltip>
         </>
       );
     }
