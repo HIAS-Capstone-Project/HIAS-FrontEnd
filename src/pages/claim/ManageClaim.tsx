@@ -867,13 +867,15 @@ const ManageClaim = () => {
               }}
             />
             <Divider type="vertical" style={{ fontSize: '200%' }} />
-            <FileExcelOutlined
-              style={{ fontSize: '200%', color: '#ff4d4f' }}
-              onClick={(e: MouseEvent) => {
-                e.stopPropagation();
-                handleReject(claim);
-              }}
-            />
+            {role !== ROLE.ACCOUNTANT && (
+              <FileExcelOutlined
+                style={{ fontSize: '200%', color: '#ff4d4f' }}
+                onClick={(e: MouseEvent) => {
+                  e.stopPropagation();
+                  handleReject(claim);
+                }}
+              />
+            )}
             {role !== ROLE.ACCOUNTANT && (
               <>
                 <Divider type="vertical" style={{ fontSize: '200%' }} />
