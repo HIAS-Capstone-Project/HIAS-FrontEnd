@@ -12,11 +12,13 @@ export interface IAuthSlice {
   user?: any;
   info?: any;
   loading: boolean;
+  isError: boolean;
 }
 
 const initialState: IAuthSlice = {
   // user: null,
   loading: false,
+  isError: false,
 };
 
 export const login = createAsyncThunk(
@@ -52,6 +54,9 @@ const authSilce = createSlice({
       state.user = null;
       LocalStorageUtil.removeSessionInfo();
     },
+    removeError: state => {
+      state.isError = false;
+    },
   },
   extraReducers: builder => {
     builder
@@ -59,6 +64,7 @@ const authSilce = createSlice({
         state.loading = true;
       })
       .addCase(login.fulfilled, (state, action) => {
+        state.isError = false;
         state.loading = false;
         if (!_.isEmpty(action.payload)) {
           LocalStorageUtil.setSessionInfo({
@@ -70,6 +76,7 @@ const authSilce = createSlice({
         state.user = { ...action.payload, isLogined: true };
       })
       .addCase(login.rejected, state => {
+        state.isError = true;
         state.loading = false;
       })
       .addCase(getInfoUser.pending, state => {
@@ -85,9 +92,10 @@ const authSilce = createSlice({
   },
 });
 
-export const { setUser, logOut } = authSilce.actions;
+export const { setUser, logOut, removeError } = authSilce.actions;
 
 export default authSilce.reducer;
 
 export const selectCurrentUser = (state: RootState) => state.auth.user;
+export const selectError = (state: RootState) => state.auth.isError;
 export const selectUserInfo = (state: RootState) => state.auth.info;

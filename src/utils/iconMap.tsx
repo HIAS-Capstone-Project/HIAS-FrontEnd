@@ -8,17 +8,14 @@ import {
   GroupOutlined,
   HomeOutlined,
   LineOutlined,
-  MessageOutlined,
   PartitionOutlined,
-  PayCircleOutlined,
   PlusSquareOutlined,
-  ShoppingCartOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
 
 const menu: any = {
-  'pay-circle-o': <PayCircleOutlined />,
-  'shopping-cart': <ShoppingCartOutlined />,
+  'pay-circle-o': <TeamOutlined />,
+  'shopping-cart': <GroupOutlined />,
   'camera-o': <CameraOutlined />,
   'line-chart': <LineOutlined />,
   'Yêu cầu bồi thường': <FolderOutlined style={{ fontSize: '150%' }} />,
@@ -30,8 +27,8 @@ const menu: any = {
   'Chính sách': <ClusterOutlined style={{ fontSize: '150%' }} />,
   'Quyền lợi': <ApartmentOutlined style={{ fontSize: '150%' }} />,
   'Danh mục quyền lợi': <PartitionOutlined style={{ fontSize: '150%' }} />,
-  team: <TeamOutlined />,
-  message: <MessageOutlined />,
+  team: <FolderOutlined />,
+  message: <ClusterOutlined />,
   'Trang chủ': <HomeOutlined style={{ fontSize: '150%' }} />,
 };
 

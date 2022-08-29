@@ -33,25 +33,25 @@ const Dashboard = () => {
     {
       icon: 'pay-circle-o',
       color: Color.green,
-      title: 'Member',
+      title: 'Thành viên',
       number: number[2]?.value,
     },
     {
       icon: 'team',
       color: Color.blue,
-      title: 'Claim',
+      title: 'Yêu cầu bồi thường',
       number: number[1]?.value,
     },
     {
       icon: 'message',
       color: Color.purple,
-      title: 'Policy',
+      title: 'Chính sách',
       number: number[3]?.value,
     },
     {
       icon: 'shopping-cart',
       color: Color.red,
-      title: 'Business Sectors',
+      title: 'Ngành nghề',
       number: number[0]?.value,
     },
   ];
