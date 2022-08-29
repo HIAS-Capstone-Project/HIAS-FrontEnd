@@ -285,8 +285,14 @@ const DetailClaim = React.forwardRef<HTMLDivElement, IDetailClaimProps>(
             )}
             {claim?.paymentAmount && (
               <Col span={8}>
-                <Card type="inner" title="Chí phí thành viên được chi trả">
-                  {claim?.paymentAmount}
+                <Card
+                  type="inner"
+                  title="Chí phí người tham gia bảo hiểm được chi trả"
+                >
+                  {(claim?.paymentAmount || 0)
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}
+                  VNĐ
                 </Card>
               </Col>
             )}

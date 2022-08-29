@@ -258,9 +258,11 @@ const ClientPage = () => {
       style={{ justifyContent: 'space-between', width: '100%' }}
     >
       <span>
-        <Button size="large" type="primary" onClick={handleAddClient}>
-          Thêm Doanh nghiệp
-        </Button>
+        {!readonly && (
+          <Button size="large" type="primary" onClick={handleAddClient}>
+            Thêm Doanh nghiệp
+          </Button>
+        )}
       </span>
       <Input.Search
         placeholder="Nhập vào giá trị muốn tìm kiếm"

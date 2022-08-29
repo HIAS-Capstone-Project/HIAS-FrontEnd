@@ -1,4 +1,4 @@
-import { Form, Input, Modal } from 'antd';
+import { Form, Input, InputNumber, Modal } from 'antd';
 import { FormProps } from '../types';
 
 const SettleForm = (props: FormProps) => {
@@ -34,12 +34,34 @@ const SettleForm = (props: FormProps) => {
           label="Số tiền thanh toán:"
           rules={[
             { required: true, message: 'Hãy nhập vào số tiền sẽ thanh toán' },
+            {
+              type: 'number',
+              min: -1,
+              message: 'Số tiên sẽ thanh toán phải lớn hơn 0',
+            },
           ]}
         >
-          <Input
+          <InputNumber
+            style={{ width: '100%' }}
+            controls={false}
+            formatter={value => {
+              let res = `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+              const index = res.indexOf('.');
+              if (index !== -1) {
+                const decimal = res
+                  .slice(index)
+                  .replace(/\$\s?|(,*)/g, '')
+                  .slice(0, 4);
+                res = res.slice(0, index);
+                return res.concat(decimal);
+              }
+              return res;
+            }}
+            parser={value => Number(value!.replace(/\$\s?|(,*)/g, ''))}
             autoComplete="false"
             size="large"
             placeholder="Nhập vào số tiền sẽ thanh toán"
+            addonAfter={<>VNĐ</>}
           />
         </Form.Item>
         <Form.Item name="remark" label="Ghi chú:">

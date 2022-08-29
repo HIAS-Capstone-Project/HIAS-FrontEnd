@@ -548,6 +548,7 @@ const ManageClaim = () => {
       assignVisible: false,
       returnVisible: false,
     });
+    setClaim({} as IClaim);
   };
 
   const handleStartProgress = (claim: IClaim) => {
