@@ -119,12 +119,12 @@ const links: any = {
     {
       to: '/member',
       name: 'Người tham gia bảo hiểm',
-      readonly: false,
+      readonly: true,
     },
     {
       to: '/client',
       name: 'Doanh nghiệp',
-      readonly: false,
+      readonly: true,
     },
     {
       to: '/service-provider',
