@@ -37,7 +37,8 @@ const EditClientForm = (props: UpdateFormProps) => {
 
   useEffect(() => {
     form.setFieldsValue(currentRowData);
-  }, [form, currentRowData]);
+  }, [form, currentRowData.clientNo]);
+
   const { corporateID } = currentRowData;
 
   const propsModal = useMemo(() => {

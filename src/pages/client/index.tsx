@@ -334,48 +334,52 @@ const ClientPage = () => {
             key="phoneNumber"
             align="center"
           />
-          <Column
-            title="Thao tác"
-            key="action"
-            align="center"
-            render={(text, row: IClient) => (
-              <span>
-                <EditTwoTone
-                  style={{ fontSize: '200%' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    handleEditClient(row);
-                  }}
-                />
-                <Divider type="vertical" style={{ fontSize: '200%' }} />
-                <DeleteOutlined
-                  style={{ fontSize: '200%', color: '#ff4d4f' }}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    setClientPageState({
-                      ...clientPageState,
-                      currentRowData: row,
-                      deleteModelVisible: true,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          />
+          {!readonly && (
+            <Column
+              title="Thao tác"
+              key="action"
+              align="center"
+              render={(text, row: IClient) => (
+                <span>
+                  <EditTwoTone
+                    style={{ fontSize: '200%' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      handleEditClient(row);
+                    }}
+                  />
+                  <Divider type="vertical" style={{ fontSize: '200%' }} />
+                  <DeleteOutlined
+                    style={{ fontSize: '200%', color: '#ff4d4f' }}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      setClientPageState({
+                        ...clientPageState,
+                        currentRowData: row,
+                        deleteModelVisible: true,
+                      });
+                    }}
+                  />
+                </span>
+              )}
+            />
+          )}
         </Table>
       </Card>
-      <EditClientForm
-        readonly={readonly}
-        viewMode={viewMode}
-        currentRowData={currentRowData}
-        form={formEdit}
-        visible={editClientModalVisible}
-        confirmLoading={editClientModalLoading}
-        onCancel={handleCancel}
-        onOk={handleEditClientOK}
-        businessSectors={businessSectors}
-        businessEmployees={businessEmployees}
-      />
+      {editClientModalVisible && (
+        <EditClientForm
+          readonly={readonly}
+          viewMode={viewMode}
+          currentRowData={currentRowData}
+          form={formEdit}
+          visible={editClientModalVisible}
+          confirmLoading={editClientModalLoading}
+          onCancel={handleCancel}
+          onOk={handleEditClientOK}
+          businessSectors={businessSectors}
+          businessEmployees={businessEmployees}
+        />
+      )}
       <AddClientForm
         form={formAdd}
         visible={addClientModalVisible}
